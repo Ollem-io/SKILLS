@@ -678,7 +678,11 @@ def render_repo_standards(target: str) -> str:
 
 
 def render_target_guide(target: str, title: str) -> str:
-    folder = central_folder(target, "custom-folder") if target != "custom" else "<custom-folder>"
+    folder = (
+        central_folder(target, "custom-folder")
+        if target != "custom"
+        else "<custom-folder>"
+    )
     if target == "monorepo":
         contract = """- New components live under `components/<component-name>/`.
 - Every component has a `readme.md` as its source of truth.
@@ -821,7 +825,13 @@ context and how agents should keep indexes current.
 """
 
 
-def write_missing(root: Path, relative_path: str, content: str, created: list[str], existing: list[str]) -> None:
+def write_missing(
+    root: Path,
+    relative_path: str,
+    content: str,
+    created: list[str],
+    existing: list[str],
+) -> None:
     path = root / relative_path
     if path.exists():
         existing.append(relative_path)
@@ -846,7 +856,11 @@ def candidate_dirs(root: Path) -> list[Path]:
         directory = root / name
         if directory.is_dir():
             search_roots.extend(path for path in directory.iterdir() if path.is_dir())
-    search_roots.extend(path for path in root.iterdir() if path.is_dir() and path.name not in {".git", "docs"})
+    search_roots.extend(
+        path
+        for path in root.iterdir()
+        if path.is_dir() and path.name not in {".git", "docs"}
+    )
     for path in sorted(set(search_roots)):
         if path_has_marker(path):
             candidates.append(path)
@@ -885,15 +899,25 @@ def adoption_plan(root: Path) -> dict:
     )
     missing = [
         item
-        for item in ["AGENTS.md", "project.md", "docs/index.md", "docs/references/docs-maintenance.md"]
+        for item in [
+            "AGENTS.md",
+            "project.md",
+            "docs/index.md",
+            "docs/references/docs-maintenance.md",
+        ]
         if not (root / item).exists()
     ]
-    detected_targets = [name for name in ["components", "site", "sites", "apps", "packages"] if (root / name).exists()]
+    detected_targets = [
+        name
+        for name in ["components", "site", "sites", "apps", "packages"]
+        if (root / name).exists()
+    ]
     candidates = [
         {
             "path": str(path.relative_to(root)),
             "markers": markers_for(path),
-            "has_readme": (path / "readme.md").exists() or (path / "README.md").exists(),
+            "has_readme": (path / "readme.md").exists()
+            or (path / "README.md").exists(),
         }
         for path in candidate_dirs(root)
     ]
@@ -943,7 +967,9 @@ def adoption_plan(root: Path) -> dict:
     }
 
 
-def scaffold(root: Path, target: str, project_name: str | None, custom_folder: str | None) -> dict:
+def scaffold(
+    root: Path, target: str, project_name: str | None, custom_folder: str | None
+) -> dict:
     created: list[str] = []
     existing: list[str] = []
     folder = central_folder(target, custom_folder)
@@ -976,8 +1002,12 @@ def scaffold(root: Path, target: str, project_name: str | None, custom_folder: s
 
 def render_agents(target: str, folder_entries: list[str]) -> str:
     guide = target_guide(target)
-    guide_line = f"- [{guide[1]}]({guide[0]}) - target folder contract.\n" if guide else ""
-    folder_links = "\n".join(f"- `{entry}/` - target folder." for entry in folder_entries)
+    guide_line = (
+        f"- [{guide[1]}]({guide[0]}) - target folder contract.\n" if guide else ""
+    )
+    folder_links = "\n".join(
+        f"- `{entry}/` - target folder." for entry in folder_entries
+    )
     if not folder_links:
         folder_links = "- Target folder: PLACE HOLDER"
     heading = ENTRYPOINT_HEADINGS.get(target, "Target Entrypoints")

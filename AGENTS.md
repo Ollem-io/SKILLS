@@ -38,6 +38,8 @@ the full documentation table of contents.
 - [Documentation references](docs/references/index.md)
 - [Agent Skills standard](docs/references/agent-skills-standard.md) — primary
   `SKILL.md` format reference
+- [skills.sh](docs/references/skills-sh.md) — distribution, discovery, and
+  security-audit layer (`npx skills add`, audits, public API)
 - [Docs maintenance](docs/references/docs-maintenance.md)
 
 ## Working Rules

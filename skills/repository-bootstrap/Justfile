@@ -1,2 +1,15 @@
+default:
+    just --list
+
+# Python skill: uv runtime, ruff formatter/linter, ty type checker.
+fmt:
+    ruff format .
+
+lint:
+    ruff check .
+
+check:
+    ty check .
+
 test:
     uv run --script tests/test_scaffold_repository.py

@@ -57,6 +57,9 @@ Keep the `SKILL.md` body under ~500 lines / ~5000 tokens; push detail into
 ## Validation
 
 The official `skills-ref validate <path>` enforces the frontmatter contract
-above. Our local `scripts/validate_skill_names.py` is a lightweight subset; see
-[Repo standards](../repo-standards.md) for the rules we enforce in CI and the
-known gaps versus the reference validator.
+above. CI runs it over every skill via `just validate-skill-spec` (pinned to a
+specific upstream commit), so the full standard — including NFKC-normalized
+unicode names and `metadata` value typing — is enforced. Our local
+`scripts/validate_skill_names.py` is a fast, dependency-light subset for quick
+feedback and pre-commit; see [Repo standards](../repo-standards.md) for the
+exact split.

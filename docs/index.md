@@ -24,6 +24,7 @@ This directory is the source of truth for repository-wide documentation.
 - [Execution plans](exec-plans/index.md)
 - [Documentation references](references/index.md)
 - [Agent Skills standard](references/agent-skills-standard.md)
+- [skills.sh distribution layer](references/skills-sh.md)
 
 ## Documentation Rules
 

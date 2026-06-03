@@ -6,25 +6,37 @@ any skill whose value is not obvious from its tests.
 
 ## Test Cases
 
-Each eval case is a prompt plus verifiable assertions about the result:
+Author cases by hand in `skills/<skill-name>/evals/evals.json` (the only file
+you write by hand; the rest are produced during runs). Each case is a prompt
+plus a human-readable expected output and verifiable assertions. See
+[`skills/repository-bootstrap/evals/evals.json`](../../skills/repository-bootstrap/evals/evals.json)
+for a worked example.
 
+- Start with 2-3 cases that vary phrasing and formality; include at least one
+  edge case (ambiguous target, malformed input).
 - **Assertions must be programmatically verifiable and specific.** "Output is a
   valid JSON array of objects with `name` and `email` keys" beats "output looks
-  reasonable".
-- Provide any input files the prompt needs.
+  reasonable". Add them after the first run, once you see what good looks like.
+- Provide any input files the prompt needs under `evals/files/`.
 
 ## With / Without Comparison
 
 Run each case twice — `with_skill` and `without_skill` — to isolate the skill's
 contribution. Capture per run: outputs, timing, and token usage.
 
-Suggested layout:
+Keep run artifacts out of the skill directory: author `evals/evals.json` inside
+the skill, but write run results to a sibling workspace
+(`<skill-name>-workspace/`) so large outputs never bloat the published skill.
 
-```
-evals/iteration-N/<case-id>/
-  with_skill/    { outputs, timing.json, grading.json }
-  without_skill/ { outputs, timing.json, grading.json }
+Suggested workspace layout:
+
+```text
+<skill-name>-workspace/iteration-N/
+  eval-<case-id>/
+    with_skill/    { outputs, timing.json, grading.json }
+    without_skill/ { outputs, timing.json, grading.json }
   benchmark.json   # aggregated pass_rate / time / tokens + delta
+  feedback.json    # per-case human review notes ("" means it looked fine)
 ```
 
 ## Grading

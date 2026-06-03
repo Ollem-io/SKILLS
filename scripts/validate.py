@@ -12,7 +12,9 @@ STEPS = {
     "install": ["just", "install"],
     "fmt": ["just", "fmt"],
     "lint": ["just", "lint"],
+    "lint-md": ["just", "lint-md"],
     "validate-skill-names": ["just", "validate-skill-names"],
+    "validate-skill-spec": ["just", "validate-skill-spec"],
     "check": ["just", "check"],
     "test-scripts": ["just", "test-scripts"],
     "test-unit": ["just", "test-unit"],
@@ -23,12 +25,21 @@ STEPS = {
 }
 
 GROUPS = {
-    "pre-commit": ["fmt", "lint", "validate-skill-names", "test-scripts", "test-unit"],
+    "pre-commit": [
+        "fmt",
+        "lint",
+        "lint-md",
+        "validate-skill-names",
+        "test-scripts",
+        "test-unit",
+    ],
     "all": [
         "install",
         "fmt",
         "lint",
+        "lint-md",
         "validate-skill-names",
+        "validate-skill-spec",
         "check",
         "test-scripts",
         "test-unit",

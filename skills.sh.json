@@ -1,0 +1,10 @@
+{
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Repository Tooling",
+      "description": "Skills that scaffold, adopt, and standardize AI-agent-friendly repositories.",
+      "skills": ["repository-bootstrap"]
+    }
+  ]
+}
