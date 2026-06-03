@@ -10,14 +10,26 @@ default:
 install:
     @echo "TODO: install repository dependencies"
 
+# Run a recipe in every skill that defines it, with a shared uv cache.
+_each recipe:
+    @for justfile in skills/*/Justfile; do \
+      skill_dir="$(dirname "$justfile")"; \
+      if (cd "$skill_dir" && just --summary 2>/dev/null | tr ' ' '\n' | grep -qx "{{recipe}}"); then \
+        echo "{{recipe}} $skill_dir"; \
+        (cd "$skill_dir" && UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" just "{{recipe}}"); \
+      else \
+        echo "skip $skill_dir: no {{recipe}} recipe"; \
+      fi; \
+    done
+
 fmt:
-    @echo "TODO: run formatters"
+    @just _each fmt
 
 lint:
-    @echo "TODO: run linters"
+    @just _each lint
 
 check:
-    @echo "TODO: run static, type, or security checks"
+    @just _each check
 
 validate-skill-names:
     UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script scripts/validate_skill_names.py

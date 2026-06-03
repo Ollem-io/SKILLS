@@ -18,8 +18,8 @@ PYPROJECT_PATH = SKILL_ROOT / "pyproject.toml"
 
 def load_scaffold():
     spec = importlib.util.spec_from_file_location("scaffold_repository", SCRIPT_PATH)
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
@@ -50,8 +50,14 @@ class RepositoryScaffoldTest(unittest.TestCase):
             self.assertTrue((root / "components" / ".gitkeep").exists())
             self.assertTrue((root / "docs" / "index.md").exists())
             self.assertTrue((root / "docs" / "component-guide.md").exists())
-            self.assertTrue((root / "docs" / "references" / "docs-maintenance.md").exists())
-            self.assertTrue((root / "docs" / "references" / "entrypoint-readme-template.md").exists())
+            self.assertTrue(
+                (root / "docs" / "references" / "docs-maintenance.md").exists()
+            )
+            self.assertTrue(
+                (
+                    root / "docs" / "references" / "entrypoint-readme-template.md"
+                ).exists()
+            )
             self.assertTrue((root / "Justfile").exists())
             self.assertTrue((root / "mise.toml").exists())
             self.assertTrue((root / "prek.toml").exists())
@@ -59,7 +65,9 @@ class RepositoryScaffoldTest(unittest.TestCase):
             self.assertTrue((root / ".github" / "workflows" / "main.yaml").exists())
             agents = (root / "AGENTS.md").read_text()
             self.assertIn("## Component Entrypoints", agents)
-            self.assertIn("[Docs maintenance](docs/references/docs-maintenance.md)", agents)
+            self.assertIn(
+                "[Docs maintenance](docs/references/docs-maintenance.md)", agents
+            )
             testing = (root / "docs" / "testing.md").read_text()
             self.assertIn("## Quick Test Map", testing)
             self.assertIn("Fast local gate", testing)
@@ -79,7 +87,9 @@ class RepositoryScaffoldTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)
 
-            result = self.run_script(root, "--target", "sites", "--project-name", "ollem.io")
+            result = self.run_script(
+                root, "--target", "sites", "--project-name", "ollem.io"
+            )
 
             self.assertEqual(result["central_folder"], "sites")
             self.assertTrue((root / "sites" / "ollem-io" / ".gitkeep").exists())
@@ -90,7 +100,16 @@ class RepositoryScaffoldTest(unittest.TestCase):
             root = pathlib.Path(tmp)
 
             result = subprocess.run(
-                ["uv", "run", "--script", str(SCRIPT_PATH), "--root", str(root), "--target", "custom"],
+                [
+                    "uv",
+                    "run",
+                    "--script",
+                    str(SCRIPT_PATH),
+                    "--root",
+                    str(root),
+                    "--target",
+                    "custom",
+                ],
                 text=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -125,12 +144,19 @@ class RepositoryScaffoldTest(unittest.TestCase):
             self.assertEqual(result["mode"], "adopt")
             self.assertIn("app.py", result["files_seen"])
             self.assertIn("AGENTS.md", result["missing_entrypoints"])
-            self.assertIn("docs/references/docs-maintenance.md", result["missing_entrypoints"])
-            self.assertEqual(result["candidate_entrypoints"][0]["path"], "components/api")
+            self.assertIn(
+                "docs/references/docs-maintenance.md", result["missing_entrypoints"]
+            )
+            self.assertEqual(
+                result["candidate_entrypoints"][0]["path"], "components/api"
+            )
             self.assertIn("package.json", result["candidate_entrypoints"][0]["markers"])
             self.assertIn("components/api", result["missing_entrypoint_readmes"])
             self.assertIn("docs/architecture.md", result["docs_gaps"])
-            self.assertIn("Which folders are deployable apps/components", result["migration_questions"][0])
+            self.assertIn(
+                "Which folders are deployable apps/components",
+                result["migration_questions"][0],
+            )
             self.assertFalse((root / "AGENTS.md").exists())
 
 
