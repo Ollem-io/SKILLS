@@ -5,6 +5,7 @@
 import importlib.util
 import json
 import pathlib
+import shutil
 import subprocess
 import tempfile
 import tomllib
@@ -14,6 +15,8 @@ import unittest
 SKILL_ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPT_PATH = SKILL_ROOT / "scripts" / "scaffold_repository.py"
 PYPROJECT_PATH = SKILL_ROOT / "pyproject.toml"
+# Resolve uv to a full path so subprocess calls do not rely on a bare name.
+UV = shutil.which("uv") or "uv"
 
 
 def load_scaffold():
@@ -31,7 +34,7 @@ class RepositoryScaffoldTest(unittest.TestCase):
 
     def run_script(self, root: pathlib.Path, *args: str) -> dict:
         result = subprocess.run(
-            ["uv", "run", "--script", str(SCRIPT_PATH), "--root", str(root), *args],
+            [UV, "run", "--script", str(SCRIPT_PATH), "--root", str(root), *args],
             check=True,
             text=True,
             stdout=subprocess.PIPE,
@@ -101,7 +104,7 @@ class RepositoryScaffoldTest(unittest.TestCase):
 
             result = subprocess.run(
                 [
-                    "uv",
+                    UV,
                     "run",
                     "--script",
                     str(SCRIPT_PATH),
