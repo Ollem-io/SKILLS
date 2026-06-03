@@ -30,7 +30,7 @@ the skill, but write run results to a sibling workspace
 
 Suggested workspace layout:
 
-```
+```text
 <skill-name>-workspace/iteration-N/
   eval-<case-id>/
     with_skill/    { outputs, timing.json, grading.json }

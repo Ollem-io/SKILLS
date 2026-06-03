@@ -1,0 +1,13 @@
+{
+  // Markdown linting for the repo. Tool: markdownlint-cli2 (pinned in mise.toml).
+  "globs": ["**/*.md"],
+  // CLAUDE.md is an `@AGENTS.md` import directive, not lintable prose.
+  "ignores": ["tmp/**", ".uv-cache/**", "node_modules/**", "**/CLAUDE.md"],
+  "config": {
+    "default": true,
+    // Prose and tables intentionally exceed a fixed line width.
+    "MD013": false,
+    // Allow repeated heading text under different parents (e.g. "Contents").
+    "MD024": { "siblings_only": true }
+  }
+}

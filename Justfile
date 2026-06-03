@@ -28,6 +28,10 @@ fmt:
 lint:
     @just _each lint
 
+# Repository-wide Markdown linter (config: .markdownlint-cli2.jsonc).
+lint-md:
+    markdownlint-cli2
+
 check:
     @just _each check
 

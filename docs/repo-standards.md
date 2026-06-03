@@ -41,6 +41,9 @@
 - Use `just` for repeatable commands when available.
 - Use `mise` for tool installation and task encapsulation when available.
 - Follow all configured pre-commit validations.
+- Lint Markdown with `markdownlint-cli2` (config in `.markdownlint-cli2.jsonc`);
+  run via `just lint-md`. It is part of both the pre-commit and full validation
+  groups.
 
 ## Language Standards
 
@@ -48,6 +51,7 @@
 | --- | --- | --- | --- |
 | Python | `uv` | `ty` | `ruff` |
 | TypeScript | `vp` | `vp` (`tsgo`) | `vp` (`oxlint`) |
+| Markdown | — | — | `markdownlint-cli2` |
 
 ## Scripts And Tests
 
