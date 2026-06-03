@@ -28,8 +28,9 @@ A new or changed skill must include, under `skills/<skill-name>/`:
    - `just validate` — full repository gate (also runs in CI).
    - `just validate-skill-spec` — upstream Agent Skills reference validator.
    - `just test` — script and skill tests.
-4. Open a PR to `main`. Link follow-up issues for any deferred work instead of
-   hiding known gaps.
+4. Open a PR to `main` and fill in the PR template
+   (`.github/PULL_REQUEST_TEMPLATE.md`). Link follow-up issues for any deferred
+   work instead of hiding known gaps.
 5. **Merge requires** all CI checks to pass **and** approval from at least one
    maintainer.
 6. On merge to `main`, the skill is available via `npx skills add Ollem-io/SKILLS`.

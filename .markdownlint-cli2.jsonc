@@ -1,8 +1,16 @@
 {
   // Markdown linting for the repo. Tool: markdownlint-cli2 (pinned in mise.toml).
   "globs": ["**/*.md"],
-  // CLAUDE.md is an `@AGENTS.md` import directive, not lintable prose.
-  "ignores": ["tmp/**", ".uv-cache/**", "node_modules/**", "**/CLAUDE.md"],
+  // CLAUDE.md is an `@AGENTS.md` import directive; the GitHub templates are
+  // form fragments (section headings without a top-level H1) — not lintable prose.
+  "ignores": [
+    "tmp/**",
+    ".uv-cache/**",
+    "node_modules/**",
+    "**/CLAUDE.md",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    ".github/ISSUE_TEMPLATE/**"
+  ],
   "config": {
     "default": true,
     // Prose and tables intentionally exceed a fixed line width.
