@@ -10,9 +10,9 @@ Repository of the public skills of the Ollem.io project. This repository contain
 
 Current skills:
 
-- [repository_bootstrap](skills/repository_bootstrap/SKILL.md) - scaffold or
-  adopt Codex-friendly repository structure for monorepo, site, sites, custom,
-  import, and adopt targets.
+- [repository-bootstrap](skills/repository-bootstrap/SKILL.md) - scaffold or
+  adopt AI-agent-friendly repository structure (Codex, Claude Code, Cursor, and
+  other agents) for monorepo, site, sites, custom, import, and adopt targets.
 
 ## Skill Contract
 

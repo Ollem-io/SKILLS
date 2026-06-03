@@ -13,7 +13,7 @@ the full documentation table of contents.
 
 ## Target Entrypoints
 
-- [repository_bootstrap](skills/repository_bootstrap/SKILL.md) scaffolds or
+- [repository-bootstrap](skills/repository-bootstrap/SKILL.md) scaffolds or
   adopts Codex-friendly repository structure.
 
 ## Core Docs

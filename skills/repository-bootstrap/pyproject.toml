@@ -1,7 +1,7 @@
 [project]
 name = "repository-bootstrap"
-version = "0.3.0"
-description = "Codex skill for bootstrapping or adopting repository structure."
+version = "0.4.0"
+description = "AI-agent-friendly skill for bootstrapping or adopting repository structure (Codex, Claude Code, Cursor, and other agents)."
 requires-python = ">=3.11"
 authors = [
   { name = "Davi Mello", email = "dsmello@ollem.io" },

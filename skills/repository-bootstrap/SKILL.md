@@ -1,11 +1,13 @@
 ---
-name: repository_bootstrap
-version: 0.3.0
-description: Bootstrap or adopt a repository structure for Codex-friendly projects. Use when the user asks to create AGENTS.md, docs, repo standards, or a target layout for monorepo, site, sites, custom, import, or adopt repository setup.
-argument-hint: <target> [name/domain/custom folder]
-authors:
-  - name: Davi Mello
-    email: dsmello@ollem.io
+name: repository-bootstrap
+description: Bootstrap or adopt a repository structure for AI-agent-friendly projects (Codex, Claude Code, Cursor, and other agents). Use when the user asks to create AGENTS.md, docs, repo standards, or a target layout for monorepo, site, sites, custom, import, or adopt repository setup.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
+metadata:
+  version: 0.4.0
+  argument-hint: <target> [name/domain/custom folder]
+  authors:
+    - name: Davi Mello
+      email: dsmello@ollem.io
 ---
 
 # Repository Bootstrap
@@ -75,7 +77,7 @@ The scaffold should follow the mature repository pattern:
 Use the deterministic scaffold helper when creating files:
 
 ```sh
-uv run --script skills/repository_bootstrap/scripts/scaffold_repository.py \
+uv run --script skills/repository-bootstrap/scripts/scaffold_repository.py \
   --root /path/to/repo \
   --target monorepo \
   --project-name example

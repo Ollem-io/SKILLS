@@ -15,6 +15,9 @@ lint:
 check:
     @echo "TODO: run static, type, or security checks"
 
+validate-skill-names:
+    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script scripts/validate_skill_names.py
+
 test-unit:
     @for justfile in skills/*/Justfile; do \
       skill_dir="$(dirname "$justfile")"; \

@@ -68,7 +68,7 @@ class RepositoryScaffoldTest(unittest.TestCase):
         metadata = tomllib.loads(PYPROJECT_PATH.read_text())
 
         self.assertEqual(metadata["project"]["name"], "repository-bootstrap")
-        self.assertEqual(metadata["project"]["version"], "0.3.0")
+        self.assertEqual(metadata["project"]["version"], "0.4.0")
         self.assertEqual(
             metadata["project"]["authors"],
             [{"name": "Davi Mello", "email": "dsmello@ollem.io"}],
