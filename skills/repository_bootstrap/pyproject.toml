@@ -1,0 +1,11 @@
+[project]
+name = "repository-bootstrap"
+version = "0.3.0"
+description = "Codex skill for bootstrapping or adopting repository structure."
+requires-python = ">=3.11"
+authors = [
+  { name = "Davi Mello", email = "dsmello@ollem.io" },
+]
+
+[tool.uv]
+package = false

@@ -1,0 +1,2 @@
+test:
+    uv run --script tests/test_scaffold_repository.py
