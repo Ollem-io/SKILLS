@@ -1,6 +1,7 @@
 ---
 name: repository-bootstrap
-description: Bootstrap or adopt a repository structure for AI-agent-friendly projects (Codex, Claude Code, Cursor, and other agents). Use when the user asks to create AGENTS.md, docs, repo standards, or a target layout for monorepo, site, sites, custom, import, or adopt repository setup.
+description: Bootstrap, scaffold, or adopt a repository structure for AI-agent-friendly projects (Codex, Claude Code, Cursor, and other agents). Use when the user asks to create or initialize AGENTS.md, docs, repo standards, a project layout, directory structure, project template, or boilerplate; to set up a new repo or monorepo; to lay out a site, sites, or custom central folder; or to import or adopt an existing repository into the standard structure.
+compatibility: Works with Claude Code, Cursor, Codex, and other Agent Skills clients. Needs the Bash, Read, Write, Edit, Glob, and Grep tools and write access to the target repository root. The scaffold helper requires `uv` (Python >= 3.11); running the skill's own tests additionally requires `just`. No network access.
 allowed-tools: Bash Read Write Edit Glob Grep
 license: GPL-3.0-or-later
 metadata:

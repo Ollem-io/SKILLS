@@ -1,0 +1,42 @@
+{
+  "skill_name": "repository-bootstrap",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up a brand-new monorepo for our project 'acme-platform' so Claude Code and other agents can navigate it. It'll hold a frontend, a backend, and some workers.",
+      "expected_output": "A scaffolded repository with AGENTS.md, the default docs/ structure, a components/ central folder, and validation templates. AGENTS.md links every created docs entrypoint, and the scaffold prints a stable JSON summary of what it created.",
+      "assertions": [
+        "A root AGENTS.md file is created",
+        "docs/index.md is created as the documentation table of contents",
+        "A components/ central folder is created (monorepo target)",
+        "AGENTS.md links to docs/index.md and the other created docs entrypoints",
+        "docs/references/docs-maintenance.md is created",
+        "The scaffold helper prints a JSON summary of created files/directories",
+        "The monorepo entrypoint section is named 'Component Entrypoints'"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We need a sites repo for ollem.io, and there's also a mobile version of the site. Scaffold it for us.",
+      "expected_output": "Because a sites project has a mobile variant, the agent asks one concise question about the preferred naming pattern (e.g. m-ollem-io vs ollem-io.mobile) before creating folders, then scaffolds a sites/ layout using the normalized domain folder name ollem-io.",
+      "assertions": [
+        "The agent asks one concise question about the mobile naming pattern before creating folders",
+        "It offers concrete options such as 'm-ollem-io' or 'ollem-io.mobile'",
+        "After a choice is made, a sites/ollem-io folder is created (domain normalized with hyphens)",
+        "AGENTS.md uses the 'Site Entrypoints' section name for the sites target"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Here's our existing Node service repo — it has a package.json but no AGENTS.md and no docs/. Adopt it into the agent-friendly structure.",
+      "expected_output": "For an adopt target the agent does NOT immediately restructure files. It maps the current repo, classifies package.json as an entrypoint marker, reports the gaps (missing AGENTS.md, missing docs, missing standards), and explains what must change before applying any migration.",
+      "files": ["evals/files/adopt-sample/package.json"],
+      "assertions": [
+        "The output is an adoption/migration plan, not an immediate bulk restructuring of files",
+        "It identifies the missing AGENTS.md and missing docs/ structure",
+        "It classifies package.json as an entrypoint marker file",
+        "It does not delete or move existing files without first explaining the change"
+      ]
+    }
+  ]
+}
