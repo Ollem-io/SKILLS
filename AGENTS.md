@@ -21,6 +21,7 @@ the full documentation table of contents.
 - [Architecture](docs/architecture.md)
 - [Structure guide](docs/structure-guide.md)
 - [Repo standards](docs/repo-standards.md)
+- [Skill authoring](docs/skill-authoring/index.md)
 - [Local development](docs/local-development.md)
 - [Testing](docs/testing.md)
 - [Validation loop](docs/validation-loop.md)
@@ -35,6 +36,8 @@ the full documentation table of contents.
 - [Decision records](docs/decisions/index.md)
 - [Execution plans](docs/exec-plans/index.md)
 - [Documentation references](docs/references/index.md)
+- [Agent Skills standard](docs/references/agent-skills-standard.md) — primary
+  `SKILL.md` format reference
 - [Docs maintenance](docs/references/docs-maintenance.md)
 
 ## Working Rules

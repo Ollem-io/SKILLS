@@ -26,8 +26,8 @@ Each skill must include:
 
 Supported helper script runtimes:
 
-- Python with `uv`.
-- TypeScript with `pnpm`.
+- Python with `uv`, `ty`, and `ruff`.
+- TypeScript with `vp`, which runs `tsgo` and `oxlint`.
 
 ## Validation
 

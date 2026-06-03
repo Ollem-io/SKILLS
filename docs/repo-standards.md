@@ -1,5 +1,19 @@
 # Repo Standards
 
+## Skills
+
+- Every skill conforms to the
+  [Agent Skills standard](references/agent-skills-standard.md), which owns the
+  `SKILL.md` frontmatter contract (`name`, `description`, `license`,
+  `compatibility`, `metadata`, `allowed-tools` and their limits).
+- Follow [Skill authoring](skill-authoring/index.md) for instruction patterns,
+  script design, descriptions, and evaluation.
+- `scripts/validate_skill_names.py` enforces the frontmatter contract in CI:
+  allowed-field whitelist, `name` (ASCII subset, <= 64 chars, matches the
+  directory), `description` (non-empty, <= 1024 chars), and `compatibility`
+  (<= 500 chars). It is a subset of the upstream `skills-ref` validator and does
+  not yet check unicode names or full `metadata` value typing.
+
 ## Repository Layout
 
 - `AGENTS.md` is the short map for agents.
@@ -22,6 +36,13 @@
 - Use `just` for repeatable commands when available.
 - Use `mise` for tool installation and task encapsulation when available.
 - Follow all configured pre-commit validations.
+
+## Language Standards
+
+| Language | Package manager | Type checker | Linter |
+| --- | --- | --- | --- |
+| Python | `uv` | `ty` | `ruff` |
+| TypeScript | `vp` | `vp` (`tsgo`) | `vp` (`oxlint`) |
 
 ## Scripts And Tests
 

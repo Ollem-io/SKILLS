@@ -25,7 +25,11 @@ test-unit:
       (cd "$skill_dir" && UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" just test); \
     done
 
+test-scripts:
+    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script tests/test_validate_skill_names.py
+
 test:
+    just test-scripts
     just test-unit
 
 test-cov:

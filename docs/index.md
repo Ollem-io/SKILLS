@@ -8,6 +8,7 @@ This directory is the source of truth for repository-wide documentation.
 - [Architecture](architecture.md)
 - [Structure Guide](structure-guide.md)
 - [Repo standards](repo-standards.md)
+- [Skill authoring](skill-authoring/index.md)
 - [Local development](local-development.md)
 - [Testing](testing.md)
 - [Validation loop](validation-loop.md)
@@ -22,6 +23,7 @@ This directory is the source of truth for repository-wide documentation.
 - [Decision records](decisions/index.md)
 - [Execution plans](exec-plans/index.md)
 - [Documentation references](references/index.md)
+- [Agent Skills standard](references/agent-skills-standard.md)
 
 ## Documentation Rules
 

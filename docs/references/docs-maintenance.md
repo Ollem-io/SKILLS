@@ -12,6 +12,8 @@ context and how agents should keep indexes current.
 - `docs/architecture.md` owns system shape, boundaries, and runtime surfaces.
 - `docs/structure-guide.md` owns target folder contracts.
 - `docs/repo-standards.md` owns repository-wide rules.
+- `docs/skill-authoring/index.md` owns guidance for writing spec-conformant
+  skills (instruction patterns, script design, descriptions, evaluation).
 - `docs/local-development.md` owns setup and local validation commands.
 - `docs/testing.md` owns test strategy and required validation commands.
 - `docs/validation-loop.md` owns the validation-first work loop.
@@ -27,6 +29,8 @@ context and how agents should keep indexes current.
 - `docs/decisions/index.md` indexes durable decision records.
 - `docs/exec-plans/index.md` indexes complex resumable work plans.
 - `docs/references/` contains detailed supporting material.
+- `docs/references/agent-skills-standard.md` is the primary reference for the
+  `SKILL.md` format; defer to the upstream Agent Skills spec it links.
 - `docs/references/entrypoint-readme-template.md` is the reusable template for
   component, app, site, worker, package, or custom entrypoint readmes.
 

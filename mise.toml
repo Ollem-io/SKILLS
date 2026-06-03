@@ -2,15 +2,18 @@
 minimum_release_age = "3d"
 
 [tools]
+# Python standard: uv package manager, ty type checker, ruff linter.
+# TypeScript standard: vp package manager; vp runs tsgo and oxlint.
 go = "1.26"
 node = "24"
 python = "3.14"
 uv = "0.11.11"
+ty = "latest"
+ruff = "latest"
 pnpm = "11.3.0"
 prek = "0.3.13"
 golangci-lint = "2.12.2"
 just = "1.51.0"
-viteplus = "0.1.22"
+vp = "0.1.22"
 cocogitto = "7.0.0"
 shellcheck = "0.11.0"
-
