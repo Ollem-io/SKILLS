@@ -2,6 +2,7 @@
 name: repository-bootstrap
 description: Bootstrap or adopt a repository structure for AI-agent-friendly projects (Codex, Claude Code, Cursor, and other agents). Use when the user asks to create AGENTS.md, docs, repo standards, or a target layout for monorepo, site, sites, custom, import, or adopt repository setup.
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
+license: GPL-3.0-or-later
 metadata:
   version: 0.4.0
   argument-hint: <target> [name/domain/custom folder]
