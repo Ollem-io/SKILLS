@@ -3,13 +3,13 @@ default:
 
 # Python skill: uv runtime, ruff formatter/linter, ty type checker.
 fmt:
-    ruff format .
+    mise exec -- ruff format .
 
 lint:
-    ruff check .
+    mise exec -- ruff check .
 
 check:
-    ty check .
+    mise exec -- ty check .
 
 test:
-    uv run --script tests/test_scaffold_repository.py
+    mise exec -- uv run --script tests/test_scaffold_repository.py

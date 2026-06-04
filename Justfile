@@ -30,13 +30,13 @@ lint:
 
 # Repository-wide Markdown linter (config: .markdownlint-cli2.jsonc).
 lint-md:
-    markdownlint-cli2
+    mise exec -- markdownlint-cli2
 
 check:
     @just _each check
 
 validate-skill-names:
-    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script scripts/validate_skill_names.py
+    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" mise exec -- uv run --script scripts/validate_skill_names.py
 
 # Validate every skill against the full upstream Agent Skills standard.
 validate-skill-spec:
@@ -45,7 +45,7 @@ validate-skill-spec:
       if [ -f "$skill_dir/SKILL.md" ] || [ -f "$skill_dir/skill.md" ]; then \
         found=1; \
         echo "skills-ref validate $skill_dir"; \
-        UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uvx --from "git+https://github.com/agentskills/agentskills.git@{{skills_ref_ref}}#subdirectory=skills-ref" skills-ref validate "$skill_dir"; \
+        UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" mise exec -- uvx --from "git+https://github.com/agentskills/agentskills.git@{{skills_ref_ref}}#subdirectory=skills-ref" skills-ref validate "$skill_dir"; \
       fi; \
     done; \
     if [ "$found" = "0" ]; then echo "no skills found under skills/"; fi
@@ -58,7 +58,7 @@ test-unit:
     done
 
 test-scripts:
-    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script tests/test_validate_skill_names.py
+    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" mise exec -- uv run --script tests/test_validate_skill_names.py
 
 test:
     just test-scripts
@@ -77,10 +77,10 @@ build-prod:
     @echo "TODO: build production artifacts"
 
 validate:
-    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script scripts/validate.py all
+    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" mise exec -- uv run --script scripts/validate.py all
 
 validate-pre-commit:
-    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script scripts/validate.py pre-commit
+    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" mise exec -- uv run --script scripts/validate.py pre-commit
 
 benchmark-tests:
-    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" uv run --script scripts/benchmark_tests.py
+    UV_CACHE_DIR="{{justfile_directory()}}/.uv-cache" mise exec -- uv run --script scripts/benchmark_tests.py

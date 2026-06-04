@@ -5,6 +5,8 @@
 - Re-read the diff before requesting review.
 - Check generated docs and indexes for stale links.
 - Run the narrowest relevant validation.
+- Confirm the PR title uses Conventional Commit format because squash merges use
+  the PR title as the final commit message.
 
 ## External Review
 
