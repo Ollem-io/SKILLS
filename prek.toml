@@ -10,11 +10,12 @@ hooks = [
     id = "fast-quality-gates",
     name = "Run fast deterministic quality gates",
     language = "system",
-    entry = "uv run --script scripts/validate.py pre-commit",
+    entry = "mise exec -- uv run --script scripts/validate.py pre-commit",
     files = "^(docs|scripts)/",
     stages = ["pre-commit"],
     pass_filenames = false,
     require_serial = true,
+    env = { MISE_EXPERIMENTAL = "1" },
   },
   {
     id = "cog-commit-message",
@@ -23,5 +24,6 @@ hooks = [
     entry = "mise exec -- cog verify --file",
     stages = ["commit-msg"],
     pass_filenames = true,
+    env = { MISE_EXPERIMENTAL = "1" },
   },
 ]

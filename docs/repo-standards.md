@@ -41,6 +41,9 @@
 - Use `just` for repeatable commands when available.
 - Use `mise` for tool installation and task encapsulation when available.
 - Follow all configured pre-commit validations.
+- Install `prek` hooks before committing. The configured hook types are
+  `pre-commit` and `commit-msg`; the commit-message hook runs `cog verify` to
+  enforce Conventional Commits locally.
 - Lint Markdown with `markdownlint-cli2` (config in `.markdownlint-cli2.jsonc`);
   run via `just lint-md`. It is part of both the pre-commit and full validation
   groups.
@@ -63,4 +66,6 @@
 ## Commits
 
 - Use Conventional Commit messages: `type(scope): description`.
+- Pull request titles must follow the same Conventional Commit format because
+  release commits are squash-merged from the PR title.
 - Keep descriptions concise, lowercase, and without a trailing period.
