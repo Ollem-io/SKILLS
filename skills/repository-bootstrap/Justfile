@@ -11,5 +11,6 @@ lint:
 check:
     mise exec -- ty check .
 
+# Only uv is required here, matching the compatibility note in SKILL.md.
 test:
-    mise exec -- uv run --script tests/test_scaffold_repository.py
+    uv run --script tests/test_scaffold_repository.py

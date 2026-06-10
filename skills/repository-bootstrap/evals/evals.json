@@ -37,6 +37,27 @@
         "It classifies package.json as an entrypoint marker file",
         "It does not delete or move existing files without first explaining the change"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Bootstrap this empty repo with a custom layout: all deployable code should live under an apps/ folder.",
+      "expected_output": "A scaffolded repository using the custom target with apps/ as the central folder. The pre-commit hook pattern watches apps/ alongside docs/ and scripts/, and AGENTS.md uses the 'Target Entrypoints' section name.",
+      "assertions": [
+        "An apps/ central folder is created",
+        "AGENTS.md uses the 'Target Entrypoints' section name for the custom target",
+        "prek.toml's fast-quality-gates hook file pattern covers apps/ (not only docs/ and scripts/)",
+        "A root readme.md and .gitignore are created"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Run the repository bootstrap again on this repo. It was already scaffolded as a site target and we customized AGENTS.md afterwards — make sure nothing gets clobbered.",
+      "expected_output": "The scaffold helper is re-run idempotently: customized files such as AGENTS.md are left untouched, the JSON summary reports them under 'existing', and no destructive overwrite happens.",
+      "assertions": [
+        "The customized AGENTS.md content is preserved byte-for-byte",
+        "The JSON summary lists already-present files under 'existing' rather than 'created'",
+        "No existing file is overwritten or deleted"
+      ]
     }
   ]
 }
