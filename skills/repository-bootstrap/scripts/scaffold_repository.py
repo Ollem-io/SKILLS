@@ -4,11 +4,26 @@
 # ///
 import argparse
 import json
+import os
 import re
 from pathlib import Path
 
 
 TARGETS = {"monorepo", "site", "sites", "custom", "adopt", "import"}
+
+
+# Vendored, generated, and cache directories that adoption scans must skip so
+# the JSON plan stays small enough to hand to an agent.
+IGNORED_DIRS = {
+    "node_modules",
+    "vendor",
+    "dist",
+    "build",
+    "coverage",
+    "target",
+    "venv",
+    "__pycache__",
+}
 
 
 TARGET_GUIDE = {
@@ -51,7 +66,13 @@ def normalize_name(value: str) -> str:
     value = value.replace(".", "-")
     value = re.sub(r"[^a-z0-9_-]+", "-", value)
     value = re.sub(r"-+", "-", value)
-    return value.strip("-_") or "site"
+    return value.strip("-_")
+
+
+def is_ignored_dir(name: str) -> bool:
+    if name == ".github":
+        return False
+    return name in IGNORED_DIRS or name.startswith(".")
 
 
 def central_folder(target: str, custom_folder: str | None) -> str | None:
@@ -64,7 +85,12 @@ def central_folder(target: str, custom_folder: str | None) -> str | None:
     if target == "custom":
         if not custom_folder:
             raise SystemExit("--central-folder is required for --target custom")
-        return normalize_name(custom_folder)
+        name = normalize_name(custom_folder)
+        if not name:
+            raise SystemExit(
+                f"--central-folder {custom_folder!r} contains no usable folder characters"
+            )
+        return name
     return None
 
 
@@ -102,13 +128,15 @@ def docs_for_target(target: str) -> dict[str, str]:
     return docs
 
 
-def tooling_for_target(target: str) -> dict[str, str]:
+def tooling_for_target(folder: str | None) -> dict[str, str]:
     return {
+        ".gitignore": render_gitignore(),
         "Justfile": render_justfile(),
         "mise.toml": render_mise_toml(),
-        "prek.toml": render_prek_toml(target),
+        "prek.toml": render_prek_toml(folder),
         "scripts/validate.py": render_validate_py(),
         "scripts/benchmark_tests.py": render_benchmark_tests_py(),
+        ".github/dependabot.yml": render_dependabot(),
         ".github/workflows/main.yaml": render_ci_dispatcher(),
         ".github/workflows/workflow.validation.yml": render_validation_workflow(),
     }
@@ -402,11 +430,12 @@ minimum_release_age = "3d"
 [tools]
 python = "3.12"
 uv = "latest"
-pnpm = "latest"
-node = "latest"
 just = "latest"
 prek = "latest"
 cocogitto = "latest"
+# Add language toolchains when a target needs them, pinned to a major version:
+# node = "22"
+# pnpm = "latest"
 
 [tasks.validate]
 description = "Run the full local validation baseline."
@@ -422,13 +451,9 @@ run = "just benchmark-tests"
 """
 
 
-def render_prek_toml(target: str) -> str:
-    target_pattern = {
-        "monorepo": "^components/[^/]+/",
-        "site": "^(site|docs|scripts)/",
-        "sites": "^(sites|docs|scripts)/",
-        "custom": "^(docs|scripts)/",
-    }.get(target, "^(docs|scripts)/")
+def render_prek_toml(folder: str | None) -> str:
+    watched = list(dict.fromkeys(filter(None, [folder, "docs", "scripts"])))
+    target_pattern = "^(" + "|".join(watched) + ")/"
     return f"""#:schema https://www.schemastore.org/prek.json
 
 minimum_prek_version = "0.3.13"
@@ -720,6 +745,59 @@ This guide owns the folder contract for the `{target}` target.
 """
 
 
+def render_readme(project_name: str | None) -> str:
+    title = project_name or "PLACE HOLDER"
+    return f"""# {title}
+
+PLACE HOLDER
+
+## Start Here
+
+- [Agent entrypoint](AGENTS.md)
+- [Documentation index](docs/index.md)
+- [Project specification](project.md)
+
+## Local Development
+
+See [Local development](docs/local-development.md).
+"""
+
+
+def render_gitignore() -> str:
+    return """# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+
+# Build artifacts
+dist/
+build/
+coverage/
+
+# Environment and editor
+.env
+.env.*
+.DS_Store
+"""
+
+
+def render_dependabot() -> str:
+    return """version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+"""
+
+
 def render_references_index() -> str:
     return """# References
 
@@ -849,17 +927,38 @@ def markers_for(path: Path) -> list[str]:
     return sorted(marker for marker in ENTRYPOINT_MARKERS if (path / marker).exists())
 
 
+def has_readme(path: Path) -> bool:
+    return any(
+        child.is_file() and child.name.lower() == "readme.md"
+        for child in path.iterdir()
+    )
+
+
+def visible_files(root: Path) -> list[str]:
+    files = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = sorted(name for name in dirnames if not is_ignored_dir(name))
+        relative = Path(dirpath).relative_to(root)
+        for name in filenames:
+            files.append(str(relative / name) if relative.parts else name)
+    return sorted(files)
+
+
 def candidate_dirs(root: Path) -> list[Path]:
     candidates = []
     search_roots = [root]
     for name in ["components", "apps", "packages", "services", "sites"]:
         directory = root / name
         if directory.is_dir():
-            search_roots.extend(path for path in directory.iterdir() if path.is_dir())
+            search_roots.extend(
+                path
+                for path in directory.iterdir()
+                if path.is_dir() and not is_ignored_dir(path.name)
+            )
     search_roots.extend(
         path
         for path in root.iterdir()
-        if path.is_dir() and path.name not in {".git", "docs"}
+        if path.is_dir() and path.name != "docs" and not is_ignored_dir(path.name)
     )
     for path in sorted(set(search_roots)):
         if path_has_marker(path):
@@ -887,15 +986,16 @@ def broken_markdown_links(root: Path, relative_path: str) -> list[str]:
 
 
 def adoption_plan(root: Path) -> dict:
-    files = sorted(
-        str(path.relative_to(root))
-        for path in root.rglob("*")
-        if path.is_file() and ".git" not in path.parts
-    )
+    files = visible_files(root)
     dirs = sorted(
         str(path.relative_to(root))
         for path in root.iterdir()
-        if path.is_dir() and path.name != ".git"
+        if path.is_dir() and not is_ignored_dir(path.name)
+    )
+    skipped = sorted(
+        path.name
+        for path in root.iterdir()
+        if path.is_dir() and is_ignored_dir(path.name) and path.name != ".git"
     )
     missing = [
         item
@@ -916,8 +1016,7 @@ def adoption_plan(root: Path) -> dict:
         {
             "path": str(path.relative_to(root)),
             "markers": markers_for(path),
-            "has_readme": (path / "readme.md").exists()
-            or (path / "README.md").exists(),
+            "has_readme": has_readme(path),
         }
         for path in candidate_dirs(root)
     ]
@@ -937,6 +1036,7 @@ def adoption_plan(root: Path) -> dict:
         "mode": "adopt",
         "files_seen": files,
         "top_level_dirs": dirs,
+        "skipped_dirs": skipped,
         "detected_target_dirs": detected_targets,
         "candidate_entrypoints": candidates,
         "missing_entrypoint_readmes": missing_readmes,
@@ -976,15 +1076,16 @@ def scaffold(
 
     for relpath, content in sorted(docs_for_target(target).items()):
         write_missing(root, relpath, content, created, existing)
-    for relpath, content in sorted(tooling_for_target(target).items()):
+    for relpath, content in sorted(tooling_for_target(folder).items()):
         write_missing(root, relpath, content, created, existing)
+    write_missing(root, "readme.md", render_readme(project_name), created, existing)
 
     folder_entries: list[str] = []
     if folder:
         write_missing(root, f"{folder}/.gitkeep", "", created, existing)
         folder_entries.append(folder)
         if target == "sites" and project_name:
-            site_name = normalize_name(project_name)
+            site_name = normalize_name(project_name) or "site"
             write_missing(root, f"{folder}/{site_name}/.gitkeep", "", created, existing)
             folder_entries.append(f"{folder}/{site_name}")
 

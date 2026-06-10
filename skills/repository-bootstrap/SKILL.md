@@ -5,7 +5,7 @@ compatibility: Works with Claude Code, Cursor, Codex, and other Agent Skills cli
 allowed-tools: Bash Read Write Edit Glob Grep
 license: GPL-3.0-or-later
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
   argument-hint: <target> [name/domain/custom folder]
   author: Davi Mello <dsmello@ollem.io>
 ---
@@ -26,7 +26,8 @@ indexes, and target-specific source folders.
 - `custom` - follow the user's requested central folder and project rules.
 - `import` or `adopt` - inspect the existing repository first and explain what
   must change to create an `AGENTS.md`, add the docs structure, or migrate
-  files into the target pattern.
+  files into the target pattern. The two names are equivalent aliases for the
+  same behavior.
 
 If a `sites` project has multiple versions for different targets, such as a
 mobile version, ask the user for the preferred naming pattern before creating
@@ -71,13 +72,18 @@ The scaffold should follow the mature repository pattern:
   dependencies, and Definition of Done.
 - validation templates should include `Justfile`, `mise.toml`, `prek.toml`,
   Python `uv run --script` helpers, and minimal CI workflow placeholders.
+- root hygiene files are created by default: `readme.md`, `.gitignore`, and
+  `.github/dependabot.yml`.
 
 ## Scaffold Script
 
-Use the deterministic scaffold helper when creating files:
+Use the deterministic scaffold helper when creating files. The script lives at
+`scripts/scaffold_repository.py` inside this skill's own directory (the folder
+containing this `SKILL.md`); resolve it from there regardless of where the
+skill is installed:
 
 ```sh
-uv run --script skills/repository-bootstrap/scripts/scaffold_repository.py \
+uv run --script <skill-dir>/scripts/scaffold_repository.py \
   --root /path/to/repo \
   --target monorepo \
   --project-name example

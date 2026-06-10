@@ -5,6 +5,7 @@
 import importlib.util
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 import tempfile
@@ -15,6 +16,7 @@ import unittest
 SKILL_ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPT_PATH = SKILL_ROOT / "scripts" / "scaffold_repository.py"
 PYPROJECT_PATH = SKILL_ROOT / "pyproject.toml"
+SKILL_MD_PATH = SKILL_ROOT / "SKILL.md"
 # Resolve uv to a full path so subprocess calls do not rely on a bare name.
 UV = shutil.which("uv") or "uv"
 
@@ -64,8 +66,13 @@ class RepositoryScaffoldTest(unittest.TestCase):
             self.assertTrue((root / "Justfile").exists())
             self.assertTrue((root / "mise.toml").exists())
             self.assertTrue((root / "prek.toml").exists())
+            self.assertTrue((root / "readme.md").exists())
+            self.assertTrue((root / ".gitignore").exists())
             self.assertTrue((root / "scripts" / "validate.py").exists())
+            self.assertTrue((root / ".github" / "dependabot.yml").exists())
             self.assertTrue((root / ".github" / "workflows" / "main.yaml").exists())
+            prek = (root / "prek.toml").read_text()
+            self.assertIn('files = "^(components|docs|scripts)/"', prek)
             agents = (root / "AGENTS.md").read_text()
             self.assertIn("## Component Entrypoints", agents)
             self.assertIn(
@@ -77,9 +84,12 @@ class RepositoryScaffoldTest(unittest.TestCase):
 
     def test_python_project_metadata_matches_skill_release(self):
         metadata = tomllib.loads(PYPROJECT_PATH.read_text())
+        skill_md = SKILL_MD_PATH.read_text()
+        skill_version = re.search(r'^\s+version: "([^"]+)"$', skill_md, re.MULTILINE)
+        assert skill_version is not None, "SKILL.md must declare metadata.version"
 
         self.assertEqual(metadata["project"]["name"], "repository-bootstrap")
-        self.assertEqual(metadata["project"]["version"], "0.4.0")
+        self.assertEqual(metadata["project"]["version"], skill_version.group(1))
         self.assertEqual(
             metadata["project"]["authors"],
             [{"name": "Davi Mello", "email": "dsmello@ollem.io"}],
@@ -120,6 +130,98 @@ class RepositoryScaffoldTest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("--central-folder is required", result.stderr)
+
+    def test_custom_scaffold_creates_folder_and_watches_it_in_prek(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+
+            result = self.run_script(
+                root, "--target", "custom", "--central-folder", "apps"
+            )
+
+            self.assertEqual(result["central_folder"], "apps")
+            self.assertTrue((root / "apps" / ".gitkeep").exists())
+            self.assertTrue((root / "docs" / "structure-guide.md").exists())
+            self.assertIn("## Target Entrypoints", (root / "AGENTS.md").read_text())
+            prek = (root / "prek.toml").read_text()
+            self.assertIn('files = "^(apps|docs|scripts)/"', prek)
+
+    def test_custom_target_rejects_unusable_central_folder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+
+            result = subprocess.run(
+                [
+                    UV,
+                    "run",
+                    "--script",
+                    str(SCRIPT_PATH),
+                    "--root",
+                    str(root),
+                    "--target",
+                    "custom",
+                    "--central-folder",
+                    "!!!",
+                ],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("no usable folder characters", result.stderr)
+
+    def test_import_target_is_alias_for_adopt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            (root / "package.json").write_text('{"name":"app"}\n')
+
+            result = self.run_script(root, "--target", "import")
+
+            self.assertEqual(result["mode"], "adopt")
+            self.assertFalse((root / "AGENTS.md").exists())
+
+    def test_scaffolded_markdown_links_resolve(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            self.run_script(root, "--target", "monorepo")
+
+            for relpath in ["AGENTS.md", "readme.md", "docs/index.md"]:
+                broken = self.scaffold.broken_markdown_links(root, relpath)
+                self.assertEqual(broken, [], f"broken links in {relpath}")
+
+    def test_adopt_skips_vendored_and_hidden_directories(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            app = root / "api"
+            app.mkdir()
+            (app / "package.json").write_text('{"name":"api"}\n')
+            (app / "Readme.md").write_text("# api\n")
+            vendored = root / "node_modules" / "lodash"
+            vendored.mkdir(parents=True)
+            (vendored / "package.json").write_text('{"name":"lodash"}\n')
+            hidden = root / ".venv"
+            hidden.mkdir()
+            (hidden / "pyvenv.cfg").write_text("home = /usr\n")
+            workflows = root / ".github" / "workflows"
+            workflows.mkdir(parents=True)
+            (workflows / "ci.yml").write_text("name: CI\n")
+
+            result = self.run_script(root, "--target", "adopt")
+
+            self.assertIn("node_modules", result["skipped_dirs"])
+            self.assertIn(".venv", result["skipped_dirs"])
+            self.assertNotIn("node_modules", result["top_level_dirs"])
+            files = result["files_seen"]
+            self.assertIn("api/package.json", files)
+            self.assertIn(".github/workflows/ci.yml", files)
+            self.assertFalse(any(f.startswith("node_modules/") for f in files))
+            self.assertFalse(any(f.startswith(".venv/") for f in files))
+            candidate_paths = [c["path"] for c in result["candidate_entrypoints"]]
+            self.assertNotIn("node_modules", candidate_paths)
+            api = next(c for c in result["candidate_entrypoints"] if c["path"] == "api")
+            self.assertTrue(api["has_readme"])
+            self.assertNotIn("api", result["missing_entrypoint_readmes"])
 
     def test_rerun_is_idempotent_and_preserves_existing_files(self):
         with tempfile.TemporaryDirectory() as tmp:
