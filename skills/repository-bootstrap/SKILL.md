@@ -5,7 +5,7 @@ compatibility: Works with Claude Code, Cursor, Codex, and other Agent Skills cli
 allowed-tools: Bash Read Write Edit Glob Grep
 license: GPL-3.0-or-later
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
   argument-hint: <target> [name/domain/custom folder]
   author: Davi Mello <dsmello@ollem.io>
 ---
@@ -47,12 +47,21 @@ folders. Suggested options are `m-ollem-io` or `ollem-io.mobile`.
 5. For new scaffolds, create the complete docs and validation structure by
    default.
 6. Put `PLACE HOLDER` only where project-specific content is still unknown.
-7. Ensure `AGENTS.md` links to every created docs entrypoint.
-8. Create `docs/references/docs-maintenance.md` with maintenance instructions
+7. After scaffolding, immediately fill what the conversation already knows:
+   if the user described the project, write `project.md` and the
+   `docs/architecture.md` system shape from that description instead of
+   leaving placeholders; for a monorepo, fill the Component Map table in
+   `docs/component-guide.md` with the planned components. Run the scaffold
+   BEFORE authoring design docs so they land inside the final structure.
+8. Ensure `AGENTS.md` links to every created docs entrypoint.
+9. Create `docs/references/docs-maintenance.md` with maintenance instructions
    for which file owns what and how to update indexes and `AGENTS.md`.
-9. Enforce the destination repo's rules before delivery. At minimum, document
-   deterministic scripts, script tests, `just test`, supported runtimes, secret
-   handling, and Conventional Commit usage.
+10. Enforce the destination repo's rules before delivery. At minimum, document
+    deterministic scripts, script tests, `just test`, supported runtimes,
+    secret handling, and Conventional Commit usage.
+11. Before delivery, list the remaining `PLACE HOLDER` markers
+    (`grep -rn "PLACE HOLDER" docs/ project.md`) and report them to the user
+    as the documentation backlog.
 
 ## Default Scaffold
 
@@ -72,8 +81,18 @@ The scaffold should follow the mature repository pattern:
   dependencies, and Definition of Done.
 - validation templates should include `Justfile`, `mise.toml`, `prek.toml`,
   Python `uv run --script` helpers, and minimal CI workflow placeholders.
+- `docs/decisions/index.md` documents the decision-record format (status,
+  date, decision, rationale, consequences) and every record is linked from
+  that index.
+- `docs/design/index.md` hosts detailed designs (domain models, protocols,
+  component internals) so `docs/architecture.md` stays a short system map.
+- monorepo `docs/component-guide.md` carries a Component Map table
+  (folder, language, purpose, tracker component value) that automation such
+  as issue boards and agent pipelines can treat as canonical.
 - root hygiene files are created by default: `readme.md`, `.gitignore`, and
-  `.github/dependabot.yml`.
+  `.github/dependabot.yml`. Note: dependabot starts opening dependency PRs
+  within hours of the first push — expected, but mention it to the user when
+  other automation works the same repo.
 
 ## Scaffold Script
 
