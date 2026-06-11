@@ -90,6 +90,10 @@ class RepositoryScaffoldTest(unittest.TestCase):
             guide = (root / "docs" / "component-guide.md").read_text()
             self.assertIn("## Component Map", guide)
             self.assertIn("Tracker component value", guide)
+            maintenance = (
+                root / "docs" / "references" / "docs-maintenance.md"
+            ).read_text()
+            self.assertIn("`docs/design/index.md` indexes", maintenance)
 
     def test_python_project_metadata_matches_skill_release(self):
         metadata = tomllib.loads(PYPROJECT_PATH.read_text())

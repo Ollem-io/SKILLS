@@ -930,6 +930,7 @@ context and how agents should keep indexes current.
 - `docs/cleanup-workflow.md` owns recurring maintenance checks.
 - `docs/engineering-maintenance.md` owns agent-maintained engineering assets.
 - `docs/decisions/index.md` indexes durable decision records.
+- `docs/design/index.md` indexes detailed design documents.
 - `docs/exec-plans/index.md` indexes complex resumable work plans.
 - `docs/references/` contains detailed supporting material.
 - `docs/references/entrypoint-readme-template.md` is the reusable template for
