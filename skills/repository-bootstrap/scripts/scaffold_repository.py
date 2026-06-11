@@ -115,6 +115,7 @@ def docs_for_target(target: str) -> dict[str, str]:
         "docs/cleanup-workflow.md": render_cleanup_workflow(),
         "docs/engineering-maintenance.md": render_engineering_maintenance(),
         "docs/decisions/index.md": render_decisions_index(),
+        "docs/design/index.md": render_design_index(),
         "docs/exec-plans/index.md": render_exec_plans_index(),
         "docs/repo-standards.md": render_repo_standards(target),
         "docs/references/index.md": render_references_index(),
@@ -166,6 +167,7 @@ This directory is the source of truth for repository-wide documentation.
 - [Recurring cleanup workflow](cleanup-workflow.md)
 - [Agent-maintained engineering system](engineering-maintenance.md)
 - [Decision records](decisions/index.md)
+- [Design documents](design/index.md)
 - [Execution plans](exec-plans/index.md)
 - [Documentation references](references/index.md)
 
@@ -365,7 +367,42 @@ def render_decisions_index() -> str:
 
 Record durable product, architecture, and operational decisions here.
 
-Use numbered slugs such as `0001-some-decision.md`.
+Use numbered slugs such as `0001-some-decision.md` and link every record from
+this index when it is added.
+
+## Record Format
+
+```markdown
+# NNNN — Short decision title
+
+Status: accepted | superseded by NNNN · Date: YYYY-MM-DD
+
+## Decision
+
+What was decided, stated as the new rule.
+
+## Rationale
+
+Why this option won, including the alternatives that were considered.
+
+## Consequences
+
+What becomes easier, harder, or required as a result.
+```
+"""
+
+
+def render_design_index() -> str:
+    return """# Design Documents
+
+Detailed designs that are too large for `docs/architecture.md`: domain models,
+protocols, component internals, integration contracts.
+
+- Add one file per design topic and link it from this index.
+- Keep `docs/architecture.md` as the short system map; deep dives live here.
+- Record the decisions a design implies in `docs/decisions/` and cross-link.
+
+PLACE HOLDER
 """
 
 
@@ -711,9 +748,18 @@ def render_target_guide(target: str, title: str) -> str:
     if target == "monorepo":
         contract = """- New components live under `components/<component-name>/`.
 - Every component has a `readme.md` as its source of truth.
-- Register new components in `AGENTS.md`.
+- Register new components in `AGENTS.md` and in the Component Map below.
 - Expose local install, format, lint, test, smoke, and build commands when they
-  apply."""
+  apply.
+
+## Component Map
+
+Keep this table current; automation (issue trackers, agent pipelines,
+component-aware concurrency) can rely on it as the canonical mapping.
+
+| Folder | Language | Purpose | Tracker component value |
+| --- | --- | --- | --- |
+| PLACE HOLDER | PLACE HOLDER | PLACE HOLDER | PLACE HOLDER |"""
     elif target in {"site", "sites"}:
         contract = """- Website folders use stable names based on the main domain.
 - Register new websites or major site entrypoints in `AGENTS.md`.
@@ -884,6 +930,7 @@ context and how agents should keep indexes current.
 - `docs/cleanup-workflow.md` owns recurring maintenance checks.
 - `docs/engineering-maintenance.md` owns agent-maintained engineering assets.
 - `docs/decisions/index.md` indexes durable decision records.
+- `docs/design/index.md` indexes detailed design documents.
 - `docs/exec-plans/index.md` indexes complex resumable work plans.
 - `docs/references/` contains detailed supporting material.
 - `docs/references/entrypoint-readme-template.md` is the reusable template for
@@ -1141,6 +1188,8 @@ first, then choose the right repo-local source of truth.
   posture.
 - [Decision records](docs/decisions/index.md) - durable product, architecture,
   and operational decisions.
+- [Design documents](docs/design/index.md) - detailed designs behind the
+  architecture map.
 - [Release process](docs/release-process.md) - branch, PR, CI, and merge
   expectations.
 - [Docs maintenance](docs/references/docs-maintenance.md) - documentation

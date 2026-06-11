@@ -81,6 +81,19 @@ class RepositoryScaffoldTest(unittest.TestCase):
             testing = (root / "docs" / "testing.md").read_text()
             self.assertIn("## Quick Test Map", testing)
             self.assertIn("Fast local gate", testing)
+            self.assertTrue((root / "docs" / "design" / "index.md").exists())
+            docs_index = (root / "docs" / "index.md").read_text()
+            self.assertIn("[Design documents](design/index.md)", docs_index)
+            self.assertIn("[Design documents](docs/design/index.md)", agents)
+            decisions = (root / "docs" / "decisions" / "index.md").read_text()
+            self.assertIn("## Record Format", decisions)
+            guide = (root / "docs" / "component-guide.md").read_text()
+            self.assertIn("## Component Map", guide)
+            self.assertIn("Tracker component value", guide)
+            maintenance = (
+                root / "docs" / "references" / "docs-maintenance.md"
+            ).read_text()
+            self.assertIn("`docs/design/index.md` indexes", maintenance)
 
     def test_python_project_metadata_matches_skill_release(self):
         metadata = tomllib.loads(PYPROJECT_PATH.read_text())

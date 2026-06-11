@@ -1,6 +1,6 @@
 [project]
 name = "repository-bootstrap"
-version = "0.5.0"
+version = "0.6.0"
 description = "AI-agent-friendly skill for bootstrapping or adopting repository structure (Codex, Claude Code, Cursor, and other agents)."
 requires-python = ">=3.11"
 license = "GPL-3.0-or-later"
