@@ -1,0 +1,59 @@
+{
+  "skill_name": "easy-docs",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our existing docs tree has Markdown files without OKF headers. Add deterministic headers without changing any file that already has frontmatter.",
+      "expected_output": "The helper reports missing concept-document headers, writes derived OKF frontmatter only to those files, preserves existing frontmatter byte-for-byte, and prints a stable JSON summary.",
+      "assertions": [
+        "Running headers --check exits nonzero and reports each missing concept-document path",
+        "Running headers --write derives type from the first bundle path segment",
+        "Title comes from the first level-one heading and description from the first prose line",
+        "Timestamp uses the last git commit date when available and the configured default date otherwise",
+        "Existing valid frontmatter and document bodies remain unchanged",
+        "A second headers --write run reports an empty written list"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Our docs index catalog is stale after adding and renaming documents. Regenerate only the generated catalog regions and verify there is no remaining drift.",
+      "expected_output": "The helper detects drift without writing in check mode, regenerates grouped and sorted entries in write mode, preserves prose outside markers, and leaves hand-maintained indexes untouched.",
+      "assertions": [
+        "index --check exits nonzero and lists every drifted index path without modifying the tree",
+        "index --write groups file entries under alphabetically sorted type headings",
+        "Entries within each type are sorted case-insensitively by title",
+        "The Sections heading is last and includes immediate Markdown-containing subdirectories",
+        "Text outside generated markers is preserved byte-for-byte",
+        "Index files without generated markers are reported as unmanaged and are not changed",
+        "A final index --check exits zero with an empty drifted list"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Set up the standard OKF documentation system in a fresh repository, using the deterministic default date so repeated runs are identical.",
+      "expected_output": "The helper creates the complete docs bundle, including the root catalog, thirteen core guides, four specialized indexes, and two reference documents, without overwriting existing paths.",
+      "assertions": [
+        "scaffold creates exactly the documented 20 files under docs by default",
+        "The bundle-root index declares okf_version 0.1 and contains generated-index markers",
+        "Every core guide has Guide frontmatter, a deterministic timestamp, and a PLACE HOLDER body",
+        "Specialized index files have generated markers and no frontmatter",
+        "Docs maintenance and entrypoint readme template references are created with Reference type",
+        "A second scaffold run creates no files, reports all paths as existing, and leaves the tree byte-identical"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Audit this docs bundle for OKF and repository documentation violations. Report everything, but do not modify any files.",
+      "expected_output": "The check command returns sorted JSON errors and warnings, exits nonzero only for errors, and leaves the repository byte-identical.",
+      "assertions": [
+        "Missing or invalid frontmatter and empty type values are reported as errors with file paths",
+        "Generated index drift and Markdown-containing subdirectories without index.md are reported as errors",
+        "Root docs over 500 lines and non-ISO log headings are reported as errors",
+        "Broken relative links and missing recommended title or description keys are warnings",
+        "Warnings alone do not cause a nonzero exit",
+        "The summary counts errors, warnings, Markdown files, and concept documents",
+        "A before-and-after tree hash proves the command wrote no files"
+      ]
+    }
+  ]
+}

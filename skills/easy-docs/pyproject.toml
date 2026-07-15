@@ -1,0 +1,12 @@
+[project]
+name = "easy-docs"
+version = "0.1.0"
+description = "Deterministic OKF documentation scaffolding, indexing, and validation helper."
+requires-python = ">=3.11"
+license = "GPL-3.0-or-later"
+authors = [
+  { name = "Davi Mello", email = "dsmello@ollem.io" },
+]
+
+[tool.uv]
+package = false

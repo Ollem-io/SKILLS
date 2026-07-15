@@ -101,26 +101,7 @@ def target_guide(target: str) -> tuple[str, str] | None:
 def docs_for_target(target: str) -> dict[str, str]:
     docs = {
         "project.md": placeholder("Project Specification"),
-        "docs/architecture.md": render_architecture(target),
         "docs/index.md": render_docs_index(target),
-        "docs/local-development.md": render_local_development(),
-        "docs/testing.md": render_testing(),
-        "docs/validation-loop.md": render_validation_loop(),
-        "docs/observability.md": render_observability(),
-        "docs/security.md": render_security(),
-        "docs/reliability.md": render_reliability(),
-        "docs/release-process.md": render_release_process(),
-        "docs/pr-review-workflow.md": render_pr_review_workflow(),
-        "docs/merge-policy.md": render_merge_policy(),
-        "docs/cleanup-workflow.md": render_cleanup_workflow(),
-        "docs/engineering-maintenance.md": render_engineering_maintenance(),
-        "docs/decisions/index.md": render_decisions_index(),
-        "docs/design/index.md": render_design_index(),
-        "docs/exec-plans/index.md": render_exec_plans_index(),
-        "docs/repo-standards.md": render_repo_standards(target),
-        "docs/references/index.md": render_references_index(),
-        "docs/references/docs-maintenance.md": render_docs_maintenance(target),
-        "docs/references/entrypoint-readme-template.md": render_entrypoint_readme_template(),
     }
     guide = target_guide(target)
     if guide:
@@ -145,274 +126,30 @@ def tooling_for_target(folder: str | None) -> dict[str, str]:
 
 def render_docs_index(target: str) -> str:
     guide = target_guide(target)
-    guide_line = f"- [{guide[1]}]({Path(guide[0]).name})\n" if guide else ""
-    return f"""# Documentation Index
+    guide_sentence = (
+        f" The target folder contract lives in [{guide[1]}]({Path(guide[0]).name})."
+        if guide
+        else ""
+    )
+    return f"""---
+type: Index
+title: Documentation Index
+description: Repository documentation entrypoint and generated catalog.
+okf_version: "0.1"
+timestamp: 1970-01-01
+---
 
-This directory is the source of truth for repository-wide documentation.
+# Documentation Index
 
-## Core Docs
+This index is the entrypoint for repository documentation.{guide_sentence}
 
-- [Project specification](../project.md)
-- [Architecture](architecture.md)
-{guide_line}- [Repo standards](repo-standards.md)
-- [Local development](local-development.md)
-- [Testing](testing.md)
-- [Validation loop](validation-loop.md)
-- [Observability](observability.md)
-- [Security](security.md)
-- [Reliability](reliability.md)
-- [Release process](release-process.md)
-- [PR review workflow](pr-review-workflow.md)
-- [Merge policy](merge-policy.md)
-- [Recurring cleanup workflow](cleanup-workflow.md)
-- [Agent-maintained engineering system](engineering-maintenance.md)
-- [Decision records](decisions/index.md)
-- [Design documents](design/index.md)
-- [Execution plans](exec-plans/index.md)
-- [Documentation references](references/index.md)
+<!-- BEGIN GENERATED DOCS INDEX -->
+<!-- END GENERATED DOCS INDEX -->
 
 ## Documentation Rules
 
-- Keep root `docs/*.md` files short and navigable.
-- Split a large topic into `docs/<topic>/index.md` plus supporting files.
-- Link new docs from this index and from `AGENTS.md` when they become agent
-  entrypoints.
-"""
-
-
-def render_local_development() -> str:
-    return """# Local Development
-
-## Bootstrap
-
-1. Install or trust the repo toolchain.
-2. Install dependencies through the repo command facade.
-3. Install local hooks when they are configured.
-
-```sh
-mise install
-just install
-prek install
-```
-
-## Validation
-
-Use the narrowest command that proves the change:
-
-```sh
-just validate
-just validate-pre-commit
-```
-
-## Target Commands
-
-Document target-specific install, format, lint, test, smoke, and build commands
-here as soon as the target exists.
-"""
-
-
-def render_testing() -> str:
-    return """# Testing
-
-## Quick Test Map
-
-| Goal | Primary command | External services | Test path |
-| --- | --- | --- | --- |
-| Fast local gate | `just validate-pre-commit` | none expected | PLACE HOLDER |
-| Unit behavior | `just test-unit` | none expected | PLACE HOLDER |
-| Smoke behavior | `just test-smoke` | mocked or local only | PLACE HOLDER |
-| Full validation | `just validate` | documented here | PLACE HOLDER |
-
-## Policy
-
-- Prefer deterministic tests with stable fixtures.
-- Keep heavy Docker, browser, full-stack, or external-service tests out of
-  commit-time hooks unless benchmark evidence supports them.
-- Record validation evidence in the task or PR when behavior changes.
-"""
-
-
-def render_architecture(target: str) -> str:
-    heading = ENTRYPOINT_HEADINGS.get(target, "Target Entrypoints")
-    return f"""# Architecture
-
-## System Shape
-
-PLACE HOLDER
-
-## {heading}
-
-- Register each major entrypoint with its path and source-of-truth readme.
-- Keep ownership and runtime boundaries explicit.
-
-## Boundary Rules
-
-- Keep core behavior isolated from delivery mechanisms and external systems.
-- Keep bootstrap/composition code thin.
-- Document concurrency, storage, and external integration assumptions here.
-"""
-
-
-def render_validation_loop() -> str:
-    return """# Validation Loop
-
-Use a validation-first loop for behavior changes:
-
-1. Identify the smallest command that should fail before the change.
-2. Run it and capture the relevant failure.
-3. Make the smallest useful change.
-4. Rerun the focused validation.
-5. Run broader repo validation when the change crosses target boundaries.
-6. Document blockers with exact command output and environment limits.
-
-Docs-only changes may use link, line-count, and readback checks when no runtime
-validation applies.
-"""
-
-
-def render_release_process() -> str:
-    return """# Release Process
-
-## Branches And PRs
-
-- Keep PRs small enough to review.
-- Use Conventional Commit titles: `type(scope): description`.
-- Wait for required CI before merge unless the user explicitly accepts risk.
-
-## Evidence
-
-- Include local validation commands and results in PR notes when code changes.
-- Link follow-up issues for deferred work instead of hiding known gaps.
-"""
-
-
-def render_pr_review_workflow() -> str:
-    return """# PR Review Workflow
-
-## Self Review
-
-- Re-read the diff before requesting review.
-- Check generated docs and indexes for stale links.
-- Run the narrowest relevant validation.
-
-## External Review
-
-- Re-check each finding against current code before editing.
-- Fix only still-valid issues.
-- Rerun focused validation after review fixes.
-"""
-
-
-def render_merge_policy() -> str:
-    return """# Merge Policy
-
-- Prefer small PRs with a clear rollback path.
-- Keep fast-follow work explicit and tracked.
-- Do not merge code changes without passing required local or remote gates unless
-  the user approves the exception.
-"""
-
-
-def render_security() -> str:
-    return """# Security
-
-- Do not commit secrets, tokens, private keys, customer data, production logs, or
-  sensitive incident evidence.
-- Use sanitized fixtures and examples.
-- Document required credentials without embedding values.
-- Prefer least-privilege CI permissions.
-"""
-
-
-def render_reliability() -> str:
-    return """# Reliability
-
-- Scripts must be deterministic for the same input.
-- Scripts with side effects must be safe to run repeatedly.
-- Document durability, retry, timeout, storage, and recovery expectations for
-  each runtime surface.
-"""
-
-
-def render_observability() -> str:
-    return """# Observability
-
-- Document logs, metrics, traces, dashboards, and local evidence commands.
-- Prefer structured logs and meaningful spans around external operations.
-- Keep debugging evidence sanitized.
-"""
-
-
-def render_cleanup_workflow() -> str:
-    return """# Cleanup Workflow
-
-- Periodically check stale docs, broken links, inactive plans, dependency drift,
-  and slow validation gates.
-- Move durable findings into the relevant source-of-truth docs.
-- Treat task notes as historical context, not current proof.
-"""
-
-
-def render_engineering_maintenance() -> str:
-    return """# Engineering Maintenance
-
-- Keep agent-maintained engineering assets small, reviewable, and tested.
-- Update indexes and entrypoint maps in the same change as structural updates.
-- Benchmark before widening commit-time hooks.
-"""
-
-
-def render_decisions_index() -> str:
-    return """# Decision Records
-
-Record durable product, architecture, and operational decisions here.
-
-Use numbered slugs such as `0001-some-decision.md` and link every record from
-this index when it is added.
-
-## Record Format
-
-```markdown
-# NNNN — Short decision title
-
-Status: accepted | superseded by NNNN · Date: YYYY-MM-DD
-
-## Decision
-
-What was decided, stated as the new rule.
-
-## Rationale
-
-Why this option won, including the alternatives that were considered.
-
-## Consequences
-
-What becomes easier, harder, or required as a result.
-```
-"""
-
-
-def render_design_index() -> str:
-    return """# Design Documents
-
-Detailed designs that are too large for `docs/architecture.md`: domain models,
-protocols, component internals, integration contracts.
-
-- Add one file per design topic and link it from this index.
-- Keep `docs/architecture.md` as the short system map; deep dives live here.
-- Record the decisions a design implies in `docs/decisions/` and cross-link.
-
-PLACE HOLDER
-"""
-
-
-def render_exec_plans_index() -> str:
-    return """# Execution Plans
-
-Use this folder for complex resumable work plans.
-
-Keep active plans linked here and move completed context into durable docs when
-the work changes repository behavior.
+- Keep root `docs/*.md` files at or below 500 lines.
+- Run the `easy-docs` skill to maintain documentation headers and indexes.
 """
 
 
@@ -697,48 +434,6 @@ jobs:
 """
 
 
-def render_repo_standards(target: str) -> str:
-    guide = target_guide(target)
-    guide_link = f"[{guide[1]}]({Path(guide[0]).name})" if guide else "the target guide"
-    return f"""# Repo Standards
-
-## Repository Layout
-
-- `AGENTS.md` is the short map for agents.
-- `docs/index.md` is the full documentation table of contents.
-- `project.md` contains the product or repository specification.
-- Target-specific folders must follow {guide_link}.
-
-## Documentation
-
-- Documentation must flow `docs/` -> topic file -> topic folder when needed.
-- Any `.md` file directly under `docs/` must stay at or below 500 lines.
-- If a root `docs/*.md` topic grows too large, create a folder with the same
-  base name and move detailed content there.
-- Every specialized documentation folder must include an `index.md`.
-- Update `AGENTS.md` and `docs/index.md` in the same change as new entrypoints.
-
-## Tooling
-
-- Prefer repo-local task runners over chat-only instructions.
-- Use `just` for repeatable commands when available.
-- Use `mise` for tool installation and task encapsulation when available.
-- Follow all configured pre-commit validations.
-
-## Scripts And Tests
-
-- Scripts must be deterministic for the same input.
-- Scripts with side effects must be safe to run repeatedly.
-- Every helper script should have a test.
-- Expose the narrowest useful validation command for each target folder.
-
-## Commits
-
-- Use Conventional Commit messages: `type(scope): description`.
-- Keep descriptions concise, lowercase, and without a trailing period.
-"""
-
-
 def render_target_guide(target: str, title: str) -> str:
     folder = (
         central_folder(target, "custom-folder")
@@ -803,9 +498,10 @@ PLACE HOLDER
 - [Documentation index](docs/index.md)
 - [Project specification](project.md)
 
-## Local Development
+## Documentation
 
-See [Local development](docs/local-development.md).
+Run the `easy-docs` skill after bootstrap to create core guides and maintain
+headers and indexes.
 """
 
 
@@ -841,112 +537,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
-"""
-
-
-def render_references_index() -> str:
-    return """# References
-
-- [Docs maintenance](docs-maintenance.md)
-- [Entrypoint readme template](entrypoint-readme-template.md)
-"""
-
-
-def render_entrypoint_readme_template() -> str:
-    return """# Entrypoint Readme Template
-
-Use this template for a component, app, site, worker, package, or other major
-repository entrypoint.
-
-## Purpose
-
-PLACE HOLDER
-
-## Runtime Surface
-
-PLACE HOLDER
-
-## Setup
-
-PLACE HOLDER
-
-## Commands
-
-- Install: PLACE HOLDER
-- Format: PLACE HOLDER
-- Lint: PLACE HOLDER
-- Test: PLACE HOLDER
-- Smoke: PLACE HOLDER
-- Build: PLACE HOLDER
-
-## Architecture Notes
-
-PLACE HOLDER
-
-## Tests
-
-PLACE HOLDER
-
-## Environment Variables
-
-PLACE HOLDER
-
-## External Dependencies
-
-PLACE HOLDER
-
-## Definition Of Done
-
-PLACE HOLDER
-"""
-
-
-def render_docs_maintenance(target: str) -> str:
-    guide = target_guide(target)
-    guide_text = f"- `{guide[0]}` owns target folder contracts.\n" if guide else ""
-    return f"""# Docs Maintenance
-
-This file explains which documentation file owns each kind of repository
-context and how agents should keep indexes current.
-
-## File Ownership
-
-- `AGENTS.md` is the short agent entrypoint. It links to the most important
-  docs and target folders.
-- `project.md` owns the product or repository specification.
-- `docs/index.md` is the documentation table of contents.
-- `docs/architecture.md` owns system shape, boundaries, and runtime surfaces.
-{guide_text}- `docs/repo-standards.md` owns repository-wide rules.
-- `docs/local-development.md` owns setup and local validation commands.
-- `docs/testing.md` owns test strategy and required validation commands.
-- `docs/validation-loop.md` owns the validation-first work loop.
-- `docs/observability.md` owns logs, metrics, tracing, and evidence guidance.
-- `docs/security.md` owns tool policy, data handling, secrets, and trust
-  boundaries.
-- `docs/reliability.md` owns idempotency, durability, and operational posture.
-- `docs/release-process.md` owns branch, PR, CI, and merge expectations.
-- `docs/pr-review-workflow.md` owns review process and second-pass checks.
-- `docs/merge-policy.md` owns PR size, fast-follow, rollback, and merge rules.
-- `docs/cleanup-workflow.md` owns recurring maintenance checks.
-- `docs/engineering-maintenance.md` owns agent-maintained engineering assets.
-- `docs/decisions/index.md` indexes durable decision records.
-- `docs/design/index.md` indexes detailed design documents.
-- `docs/exec-plans/index.md` indexes complex resumable work plans.
-- `docs/references/` contains detailed supporting material.
-- `docs/references/entrypoint-readme-template.md` is the reusable template for
-  component, app, site, worker, package, or custom entrypoint readmes.
-
-## Update Rules
-
-- Update `AGENTS.md` when adding, moving, renaming, or removing a major
-  repo entrypoint, target folder, app, site, or workflow.
-- Update `docs/index.md` when adding, moving, renaming, or removing docs.
-- Update `docs/references/index.md` when adding reference files.
-- Keep root `docs/*.md` files short. If a topic grows too large, split it into
-  `docs/<topic>/index.md` plus supporting files.
-- Every specialized docs folder must have an `index.md`.
-- New placeholder files must be replaced with real content before the related
-  workflow is considered complete.
 """
 
 
@@ -1046,12 +636,7 @@ def adoption_plan(root: Path) -> dict:
     )
     missing = [
         item
-        for item in [
-            "AGENTS.md",
-            "project.md",
-            "docs/index.md",
-            "docs/references/docs-maintenance.md",
-        ]
+        for item in ["AGENTS.md", "project.md", "docs/index.md"]
         if not (root / item).exists()
     ]
     detected_targets = [
@@ -1068,17 +653,7 @@ def adoption_plan(root: Path) -> dict:
         for path in candidate_dirs(root)
     ]
     missing_readmes = [item["path"] for item in candidates if not item["has_readme"]]
-    docs_gaps = [
-        item
-        for item in [
-            "docs/architecture.md",
-            "docs/repo-standards.md",
-            "docs/local-development.md",
-            "docs/testing.md",
-            "docs/references/index.md",
-        ]
-        if not (root / item).exists()
-    ]
+    docs_gaps = [item for item in ["docs/index.md"] if not (root / item).exists()]
     return {
         "mode": "adopt",
         "files_seen": files,
@@ -1089,6 +664,7 @@ def adoption_plan(root: Path) -> dict:
         "missing_entrypoint_readmes": missing_readmes,
         "missing_entrypoints": missing,
         "docs_gaps": docs_gaps,
+        "docs_system": "delegate to easy-docs skill (OKF headers, generated indexes)",
         "broken_links": {
             "AGENTS.md": broken_markdown_links(root, "AGENTS.md"),
             "docs/index.md": broken_markdown_links(root, "docs/index.md"),
@@ -1105,7 +681,7 @@ def adoption_plan(root: Path) -> dict:
         "recommendations": [
             "map the existing repository before moving files",
             "create or update AGENTS.md from the existing repository structure",
-            "create the default docs structure if it is missing",
+            "create AGENTS.md, project.md, and docs/index.md, then run easy-docs",
             "choose monorepo, site, sites, or custom before moving existing files",
             "register existing entrypoints in place unless the user approves a migration",
             "explain required file moves, docs updates, and validation commands before applying them",
@@ -1150,9 +726,7 @@ def scaffold(
 
 def render_agents(target: str, folder_entries: list[str]) -> str:
     guide = target_guide(target)
-    guide_line = (
-        f"- [{guide[1]}]({guide[0]}) - target folder contract.\n" if guide else ""
-    )
+    guide_line = f"- Folder contract: [{guide[1]}]({guide[0]})\n" if guide else ""
     folder_links = "\n".join(
         f"- `{entry}/` - target folder." for entry in folder_entries
     )
@@ -1167,38 +741,17 @@ first, then choose the right repo-local source of truth.
 
 ## Start Here
 
-- [Documentation index](docs/index.md) - full docs hierarchy and where each kind
-  of context lives.
+- [Documentation index](docs/index.md) - documentation entrypoint and generated
+  catalog.
 - [Specification](project.md) - product or repository specification.
-- [Architecture](docs/architecture.md) - current system shape, boundary map, and
-  runtime surface.
-{guide_line}- [Repo standards](docs/repo-standards.md) - naming, required files,
-  tooling, and workflow rules.
-- [Local development](docs/local-development.md) - setup commands, toolchain, and
-  task execution.
-- [Testing](docs/testing.md) - test strategy and validation commands.
-- [Validation loop](docs/validation-loop.md) - validation-first work loop.
-- [Observability](docs/observability.md) - evidence and debugging guidance.
-- [Execution plans](docs/exec-plans/index.md) - complex resumable work plans.
-- [Agent-assisted PR review](docs/pr-review-workflow.md) - review workflow.
-- [Small PR and fast-follow merge policy](docs/merge-policy.md) - PR size,
-  rollback, and merge expectations.
-- [Security](docs/security.md) - tool policy, data handling, and secret handling.
-- [Reliability](docs/reliability.md) - idempotency, durability, and operational
-  posture.
-- [Decision records](docs/decisions/index.md) - durable product, architecture,
-  and operational decisions.
-- [Design documents](docs/design/index.md) - detailed designs behind the
-  architecture map.
-- [Release process](docs/release-process.md) - branch, PR, CI, and merge
-  expectations.
-- [Docs maintenance](docs/references/docs-maintenance.md) - documentation
-  ownership and index update rules.
+
+<!-- BEGIN GENERATED CORE DOCS -->
+<!-- END GENERATED CORE DOCS -->
 
 ## {heading}
 
 - Type: `{target}`
-{folder_links}
+{guide_line}{folder_links}
 
 ## Must Follow
 
@@ -1207,6 +760,8 @@ first, then choose the right repo-local source of truth.
 - If a root `docs/*.md` topic would exceed 500 lines, create a folder with the
   same base name and move detailed content there.
 - Every specialized documentation folder must include an `index.md`.
+- Documentation system (headers, indexes, and docs rules) is owned by the
+  `easy-docs` skill; run it after structural changes.
 - Update `AGENTS.md`, `docs/index.md`, and the relevant target guide when adding
   or moving entrypoints.
 - Use deterministic scripts and tests for repository tooling.
