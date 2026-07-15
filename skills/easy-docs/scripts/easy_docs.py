@@ -433,7 +433,8 @@ def direct_concept_files(directory: Path) -> list[Path]:
         (
             path
             for path in directory.iterdir()
-            if path.is_file()
+            if not path.is_symlink()
+            and path.is_file()
             and path.name.lower().endswith(".md")
             and path.name not in RESERVED_FILENAMES
         ),
@@ -446,7 +447,8 @@ def immediate_markdown_sections(directory: Path) -> list[Path]:
         (
             path
             for path in directory.iterdir()
-            if path.is_dir()
+            if not path.is_symlink()
+            and path.is_dir()
             and not is_ignored_directory(path.name)
             and contains_markdown(path)
         ),
@@ -506,7 +508,7 @@ def render_catalog(
         for section in immediate_markdown_sections(directory):
             index_path = section / "index.md"
             description = ""
-            if index_path.is_file():
+            if index_path.is_file() and not index_path.is_symlink():
                 status, metadata, body = parse_frontmatter(index_path.read_text())
                 if status == "valid":
                     description = metadata_value(metadata, "description")
@@ -536,7 +538,11 @@ def replace_generated_region(
 
 
 def index_candidates(bundle: Path) -> list[Path]:
-    return [path for path in iter_markdown_files(bundle) if path.name == "index.md"]
+    return [
+        path
+        for path in iter_markdown_files(bundle)
+        if path.name == "index.md" and not path.is_symlink()
+    ]
 
 
 def index_changes(
@@ -616,8 +622,9 @@ def warning(code: str, path: str, message: str) -> dict[str, str]:
 
 
 def directories_requiring_indexes(bundle: Path) -> list[Path]:
-    directories: set[Path] = set()
-    for markdown in iter_markdown_files(bundle):
+    markdown_files = iter_markdown_files(bundle)
+    directories: set[Path] = {bundle} if markdown_files else set()
+    for markdown in markdown_files:
         current = markdown.parent
         while current != bundle:
             directories.add(current)
@@ -703,6 +710,14 @@ def check_command(
                     "index_frontmatter",
                     relpath,
                     "Only the bundle-root index.md may contain frontmatter (OKF §6/§11).",
+                )
+            )
+        elif path.name == "log.md" and status == "valid":
+            errors.append(
+                error(
+                    "log_frontmatter",
+                    relpath,
+                    "log.md must not contain frontmatter.",
                 )
             )
         elif not is_reserved:
@@ -801,7 +816,7 @@ def check_command(
 
     for directory in directories_requiring_indexes(bundle):
         index_path = directory / "index.md"
-        if not index_path.is_file():
+        if not index_path.is_file() or index_path.is_symlink():
             errors.append(
                 error(
                     "missing_index",

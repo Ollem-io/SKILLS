@@ -37,6 +37,7 @@
       "assertions": [
         "The output is an adoption/migration plan, not an immediate bulk restructuring of files",
         "It identifies the missing AGENTS.md and missing docs/index.md",
+        "It identifies the missing project.md",
         "It classifies package.json as an entrypoint marker file",
         "It notes the docs system (headers, indexes, standards docs) is delegated to the easy-docs skill",
         "It does not delete or move existing files without first explaining the change"

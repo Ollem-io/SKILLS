@@ -588,6 +588,65 @@ class EasyDocsTest(unittest.TestCase):
             assert match is not None
             self.assertTrue(match.group(1).strip())
 
+    @unittest.skipUnless(os.name == "posix", "symlink tests require POSIX")
+    def test_symlinked_index_does_not_satisfy_required_index(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp) / "repo"
+            self.scaffold_and_index(root)
+            topic = root / "docs/topic"
+            topic.mkdir()
+            (topic / "guide.md").write_text(
+                concept("Guide", "Topic Guide", "Topic documentation.")
+            )
+            outside = pathlib.Path(tmp) / "outside-index.md"
+            outside_content = "# Outside Index\n"
+            outside.write_text(outside_content)
+            (topic / "index.md").symlink_to(outside)
+            self.run_script(root, "index", "--write")
+
+            result, _ = self.run_script(root, "check", expected_status=1)
+
+            missing_indexes = [
+                item["path"]
+                for item in result["errors"]
+                if item["code"] == "missing_index"
+            ]
+            self.assertEqual(missing_indexes, ["docs/topic/index.md"])
+            self.assertEqual(outside.read_text(), outside_content)
+
+    def test_root_level_markdown_requires_bundle_index(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            docs = root / "docs"
+            docs.mkdir()
+            (docs / "guide.md").write_text(
+                concept("Guide", "Root Guide", "Root-level documentation.")
+            )
+
+            result, _ = self.run_script(root, "check", expected_status=1)
+
+            missing_indexes = [
+                item["path"]
+                for item in result["errors"]
+                if item["code"] == "missing_index"
+            ]
+            self.assertEqual(missing_indexes, ["docs/index.md"])
+
+    def test_log_must_not_contain_frontmatter(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            self.scaffold_and_index(root)
+            (root / "docs/log.md").write_text(
+                "---\ntype: Guide\n---\n\n# Log\n\n## 2026-07-15\n\nChanged.\n"
+            )
+
+            result, _ = self.run_script(root, "check", expected_status=1)
+
+            log_errors = [
+                item for item in result["errors"] if item["path"] == "docs/log.md"
+            ]
+            self.assertEqual([item["code"] for item in log_errors], ["log_frontmatter"])
+
     def test_python_project_metadata_matches_skill_release(self):
         metadata = tomllib.loads(PYPROJECT_PATH.read_text())
         skill_md = SKILL_MD_PATH.read_text()

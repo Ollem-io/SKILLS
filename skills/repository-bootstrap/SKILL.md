@@ -139,5 +139,6 @@ existing files intact, and prints a stable JSON summary.
   were not applied.
 - `AGENTS.md` contains the `GENERATED CORE DOCS` markers so `easy-docs` can
   maintain the core docs list.
-- Files created by this skill are linked from `AGENTS.md` and `docs/index.md`.
+- `AGENTS.md` links `project.md`, `docs/index.md`, and the target guide;
+  `docs/index.md` links the target guide and contains the generated index markers.
 - The skill's `just test` passes after changes to this skill.

@@ -86,11 +86,13 @@ class RepositoryScaffoldTest(unittest.TestCase):
             docs_index = (root / "docs" / "index.md").read_text()
             self.assertIn('okf_version: "0.1"', docs_index)
             self.assertIn("<!-- BEGIN GENERATED DOCS INDEX -->", docs_index)
+            self.assertIn("<!-- END GENERATED DOCS INDEX -->", docs_index)
             self.assertIn("[Component Guide](component-guide.md)", docs_index)
 
             agents = (root / "AGENTS.md").read_text()
             self.assertIn("## Component Entrypoints", agents)
             self.assertIn("<!-- BEGIN GENERATED CORE DOCS -->", agents)
+            self.assertIn("<!-- END GENERATED CORE DOCS -->", agents)
             self.assertNotIn("docs/references/docs-maintenance.md", agents)
             self.assertIn("`easy-docs` skill", agents)
 
