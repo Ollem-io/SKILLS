@@ -2,6 +2,13 @@
 
 This directory is the source of truth for repository-wide documentation.
 
+## Skills
+
+- [repository-bootstrap](../skills/repository-bootstrap/SKILL.md) — scaffold
+  or adopt AI-agent-friendly repository structure.
+- [easy-docs](../skills/easy-docs/SKILL.md) — organize repository
+  documentation as an OKF knowledge bundle with generated indexes.
+
 ## Core Docs
 
 - [Project specification](../project.md)

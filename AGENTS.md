@@ -15,6 +15,9 @@ the full documentation table of contents.
 
 - [repository-bootstrap](skills/repository-bootstrap/SKILL.md) scaffolds or
   adopts Codex-friendly repository structure.
+- [easy-docs](skills/easy-docs/SKILL.md) organizes repository documentation
+  with OKF (Open Knowledge Format) headers and generated, drift-checked
+  indexes.
 
 ## Core Docs
 

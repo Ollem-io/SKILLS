@@ -42,6 +42,10 @@ Supported helper-script runtimes:
 - [repository-bootstrap](skills/repository-bootstrap/SKILL.md) — scaffold or
   adopt AI-agent-friendly repository structure for `monorepo`, `site`, `sites`,
   `custom`, `import`, and `adopt` targets.
+- [easy-docs](skills/easy-docs/SKILL.md) — organize repository documentation
+  as an OKF (Open Knowledge Format) knowledge bundle: frontmatter headers,
+  generated drift-checked indexes, and a conformance gate. Composes with
+  `repository-bootstrap`, which owns repository structure.
 
 ## Governance
 

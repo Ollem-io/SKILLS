@@ -4,13 +4,14 @@
     {
       "id": 1,
       "prompt": "Set up a brand-new monorepo for our project 'acme-platform' so Claude Code and other agents can navigate it. It'll hold a frontend, a backend, and some workers.",
-      "expected_output": "A scaffolded repository with AGENTS.md, the default docs/ structure, a components/ central folder, and validation templates. AGENTS.md links every created docs entrypoint, and the scaffold prints a stable JSON summary of what it created.",
+      "expected_output": "A scaffolded repository with AGENTS.md, a minimal docs/index.md handoff, docs/component-guide.md, a components/ central folder, and validation templates. AGENTS.md and docs/index.md contain generated markers for easy-docs, the response recommends running easy-docs for the docs system, and the scaffold prints a stable JSON summary of what it created.",
       "assertions": [
         "A root AGENTS.md file is created",
-        "docs/index.md is created as the documentation table of contents",
+        "docs/index.md is created with BEGIN GENERATED DOCS INDEX markers",
         "A components/ central folder is created (monorepo target)",
-        "AGENTS.md links to docs/index.md and the other created docs entrypoints",
-        "docs/references/docs-maintenance.md is created",
+        "AGENTS.md links to docs/index.md and docs/component-guide.md",
+        "AGENTS.md contains BEGIN GENERATED CORE DOCS markers",
+        "The response recommends running easy-docs for the docs system",
         "The scaffold helper prints a JSON summary of created files/directories",
         "The monorepo entrypoint section is named 'Component Entrypoints'"
       ]
@@ -29,12 +30,16 @@
     {
       "id": 3,
       "prompt": "Here's our existing Node service repo — it has a package.json but no AGENTS.md and no docs/. Adopt it into the agent-friendly structure.",
-      "expected_output": "For an adopt target the agent does NOT immediately restructure files. It maps the current repo, classifies package.json as an entrypoint marker, reports the gaps (missing AGENTS.md, missing docs, missing standards), and explains what must change before applying any migration.",
-      "files": ["evals/files/adopt-sample/package.json"],
+      "expected_output": "For an adopt target the agent does NOT immediately restructure files. It maps the current repo, classifies package.json as an entrypoint marker, reports the structural gaps (missing AGENTS.md, project.md, docs/index.md), notes that the docs system itself is delegated to the easy-docs skill, and explains what must change before applying any migration.",
+      "files": [
+        "evals/files/adopt-sample/package.json"
+      ],
       "assertions": [
         "The output is an adoption/migration plan, not an immediate bulk restructuring of files",
-        "It identifies the missing AGENTS.md and missing docs/ structure",
+        "It identifies the missing AGENTS.md and missing docs/index.md",
+        "It identifies the missing project.md",
         "It classifies package.json as an entrypoint marker file",
+        "It notes the docs system (headers, indexes, standards docs) is delegated to the easy-docs skill",
         "It does not delete or move existing files without first explaining the change"
       ]
     },

@@ -1,0 +1,16 @@
+default:
+    just --list
+
+# Python skill: uv runtime, ruff formatter/linter, ty type checker.
+fmt:
+    mise exec -- ruff format .
+
+lint:
+    mise exec -- ruff check .
+
+check:
+    mise exec -- ty check .
+
+# Only uv is required here, matching the compatibility note in SKILL.md.
+test:
+    uv run --script tests/test_easy_docs.py

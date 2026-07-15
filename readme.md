@@ -28,6 +28,9 @@ Current skills:
 - [repository-bootstrap](skills/repository-bootstrap/SKILL.md) - scaffold or
   adopt AI-agent-friendly repository structure (Codex, Claude Code, Cursor, and
   other agents) for monorepo, site, sites, custom, import, and adopt targets.
+- [easy-docs](skills/easy-docs/SKILL.md) - organize repository documentation
+  as an OKF (Open Knowledge Format) knowledge bundle: frontmatter headers,
+  generated indexes, and a deterministic conformance check.
 
 ## Skill Contract
 

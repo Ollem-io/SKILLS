@@ -44,56 +44,61 @@ class RepositoryScaffoldTest(unittest.TestCase):
         )
         return json.loads(result.stdout)
 
-    def test_monorepo_scaffold_creates_docs_agents_and_components(self):
+    def test_monorepo_scaffold_creates_structure_and_docs_handoff(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)
 
             result = self.run_script(root, "--target", "monorepo")
 
             self.assertEqual(result["central_folder"], "components")
-            self.assertTrue((root / "AGENTS.md").exists())
-            self.assertTrue((root / "components" / ".gitkeep").exists())
-            self.assertTrue((root / "docs" / "index.md").exists())
-            self.assertTrue((root / "docs" / "component-guide.md").exists())
-            self.assertTrue(
-                (root / "docs" / "references" / "docs-maintenance.md").exists()
-            )
-            self.assertTrue(
-                (
-                    root / "docs" / "references" / "entrypoint-readme-template.md"
-                ).exists()
-            )
-            self.assertTrue((root / "Justfile").exists())
-            self.assertTrue((root / "mise.toml").exists())
-            self.assertTrue((root / "prek.toml").exists())
-            self.assertTrue((root / "readme.md").exists())
-            self.assertTrue((root / ".gitignore").exists())
-            self.assertTrue((root / "scripts" / "validate.py").exists())
-            self.assertTrue((root / ".github" / "dependabot.yml").exists())
-            self.assertTrue((root / ".github" / "workflows" / "main.yaml").exists())
+            for relative_path in [
+                "AGENTS.md",
+                "components/.gitkeep",
+                "docs/index.md",
+                "docs/component-guide.md",
+                "Justfile",
+                "mise.toml",
+                "prek.toml",
+                "readme.md",
+                ".gitignore",
+                "scripts/validate.py",
+                ".github/dependabot.yml",
+                ".github/workflows/main.yaml",
+                ".github/workflows/workflow.validation.yml",
+            ]:
+                self.assertTrue((root / relative_path).exists(), relative_path)
+
+            for relative_path in [
+                "docs/references",
+                "docs/decisions",
+                "docs/design",
+                "docs/exec-plans",
+                "docs/testing.md",
+                "docs/architecture.md",
+                "docs/repo-standards.md",
+                "docs/local-development.md",
+            ]:
+                self.assertFalse((root / relative_path).exists(), relative_path)
+
             prek = (root / "prek.toml").read_text()
             self.assertIn('files = "^(components|docs|scripts)/"', prek)
+
+            docs_index = (root / "docs" / "index.md").read_text()
+            self.assertIn('okf_version: "0.1"', docs_index)
+            self.assertIn("<!-- BEGIN GENERATED DOCS INDEX -->", docs_index)
+            self.assertIn("<!-- END GENERATED DOCS INDEX -->", docs_index)
+            self.assertIn("[Component Guide](component-guide.md)", docs_index)
+
             agents = (root / "AGENTS.md").read_text()
             self.assertIn("## Component Entrypoints", agents)
-            self.assertIn(
-                "[Docs maintenance](docs/references/docs-maintenance.md)", agents
-            )
-            testing = (root / "docs" / "testing.md").read_text()
-            self.assertIn("## Quick Test Map", testing)
-            self.assertIn("Fast local gate", testing)
-            self.assertTrue((root / "docs" / "design" / "index.md").exists())
-            docs_index = (root / "docs" / "index.md").read_text()
-            self.assertIn("[Design documents](design/index.md)", docs_index)
-            self.assertIn("[Design documents](docs/design/index.md)", agents)
-            decisions = (root / "docs" / "decisions" / "index.md").read_text()
-            self.assertIn("## Record Format", decisions)
+            self.assertIn("<!-- BEGIN GENERATED CORE DOCS -->", agents)
+            self.assertIn("<!-- END GENERATED CORE DOCS -->", agents)
+            self.assertNotIn("docs/references/docs-maintenance.md", agents)
+            self.assertIn("`easy-docs` skill", agents)
+
             guide = (root / "docs" / "component-guide.md").read_text()
             self.assertIn("## Component Map", guide)
             self.assertIn("Tracker component value", guide)
-            maintenance = (
-                root / "docs" / "references" / "docs-maintenance.md"
-            ).read_text()
-            self.assertIn("`docs/design/index.md` indexes", maintenance)
 
     def test_python_project_metadata_matches_skill_release(self):
         metadata = tomllib.loads(PYPROJECT_PATH.read_text())
@@ -108,6 +113,22 @@ class RepositoryScaffoldTest(unittest.TestCase):
             [{"name": "Davi Mello", "email": "dsmello@ollem.io"}],
         )
         self.assertFalse(metadata["tool"]["uv"]["package"])
+
+    def test_adoption_plan_delegates_docs_system(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+
+            result = self.run_script(root, "--target", "adopt")
+
+            self.assertEqual(
+                result["docs_system"],
+                "delegate to easy-docs skill (OKF headers, generated indexes)",
+            )
+            self.assertEqual(
+                result["missing_entrypoints"],
+                ["AGENTS.md", "project.md", "docs/index.md"],
+            )
+            self.assertEqual(result["docs_gaps"], ["docs/index.md"])
 
     def test_sites_target_normalizes_domain_name(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -261,16 +282,16 @@ class RepositoryScaffoldTest(unittest.TestCase):
 
             self.assertEqual(result["mode"], "adopt")
             self.assertIn("app.py", result["files_seen"])
-            self.assertIn("AGENTS.md", result["missing_entrypoints"])
-            self.assertIn(
-                "docs/references/docs-maintenance.md", result["missing_entrypoints"]
+            self.assertEqual(
+                result["missing_entrypoints"],
+                ["AGENTS.md", "project.md", "docs/index.md"],
             )
             self.assertEqual(
                 result["candidate_entrypoints"][0]["path"], "components/api"
             )
             self.assertIn("package.json", result["candidate_entrypoints"][0]["markers"])
             self.assertIn("components/api", result["missing_entrypoint_readmes"])
-            self.assertIn("docs/architecture.md", result["docs_gaps"])
+            self.assertEqual(result["docs_gaps"], ["docs/index.md"])
             self.assertIn(
                 "Which folders are deployable apps/components",
                 result["migration_questions"][0],
